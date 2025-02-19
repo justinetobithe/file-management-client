@@ -1,0 +1,222 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    font-family: 'Poppins', sans-serif;
+    /* REACT SUITE */
+    /* --rs-primary-50: hsl(50, 90%, 96%) !important;
+    --rs-primary-100: hsl(48, 89%, 89%) !important;
+    --rs-primary-200: hsl(49, 90%, 77%) !important;
+    --rs-primary-300: hsl(46, 91%, 62%) !important;
+    --rs-primary-400: hsl(44, 90%, 56%) !important;
+    --rs-primary-500: hsl(46, 91%, 62%) !important;
+    --rs-primary-600: hsl(33, 88%, 44%) !important;
+    --rs-primary-700: hsl(26, 85%, 37%) !important;
+    --rs-primary-800: hsl(23, 78%, 31%) !important;
+    --rs-primary-900: hsl(22, 73%, 26%) !important; */
+    /* --rs-primary-50: hsl(351, 100%, 97%) !important;
+    --rs-primary-100: hsl(351, 100%, 95%) !important;
+    --rs-primary-200: hsl(350, 100%, 88%) !important;
+    --rs-primary-300: hsl(349, 100%, 82%) !important;
+    --rs-primary-400: hsl(348, 99%, 71%) !important;
+    --rs-primary-500: hsl(346, 93%, 60%) !important;
+    --rs-primary-600: hsl(344, 80%, 50%) !important;
+    --rs-primary-700: hsl(342, 87%, 41%) !important;
+    --rs-primary-800: hsl(340, 83%, 35%) !important;
+    --rs-primary-900: hsl(339, 78%, 30%) !important; */
+    --rs-primary-50: hsl(232, 69%, 20%) !important;
+    --rs-primary-100: hsl(232, 69%, 18%) !important;
+    --rs-primary-200: hsl(232, 69%, 16%) !important;
+    --rs-primary-300: hsl(232, 69%, 14%) !important;
+    --rs-primary-400: hsl(232, 69%, 12%) !important;
+    --rs-primary-500: hsl(232, 69%, 10%) !important;
+    /* Original color */
+    --rs-primary-600: hsl(232, 69%, 8%) !important;
+    --rs-primary-700: hsl(232, 69%, 6%) !important;
+    --rs-primary-800: hsl(232, 69%, 4%) !important;
+    --rs-primary-900: hsl(232, 69%, 2%) !important;
+
+
+    /* END REACT SUITE */
+
+    --background: hsl(0 0% 100%);
+    --foreground: hsl(221 39% 11%);
+
+    --card: hsl(0 0% 100%);
+    --card-foreground: hsl(222.2 84% 4.9%);
+
+    --popover: hsl(0 0% 100%);
+    --popover-foreground: hsl(222.2 84% 4.9%);
+
+    /* --primary: hsl(46 91% 62%); */
+    /* --primary: hsl(350 100% 88%); */
+    --primary: #7393B3;
+    --primary-foreground: hsl(0 0% 100%);
+
+    --secondary: hsl(210 40% 96.1%);
+    --secondary-foreground: hsl(222.2 47.4% 11.2%);
+
+    --muted: hsl(210 40% 96.1%);
+    --muted-foreground: hsl(215.4 16.3% 46.9%);
+
+    --accent: hsl(210 40% 96.1%);
+    --accent-foreground: hsl(222.2 47.4% 11.2%);
+
+    --success: hsl(152, 69%, 31%);
+    --success-foreground: hsl(210 40% 98%);
+
+    --destructive: hsl(0 84.2% 60.2%);
+    --destructive-foreground: hsl(210 40% 98%);
+
+    --border: hsl(214.3 31.8% 91.4%);
+    --input: hsl(214.3 31.8% 91.4%);
+    --ring: hsl(222.2 84% 4.9%);
+
+    --radius: 0.5rem;
+
+    /* FULLCALENDAR OVERRIDE */
+    --fc-small-font-size: 0.85em;
+    --fc-page-bg-color: #fff;
+    --fc-neutral-bg-color: rgba(208, 208, 208, 0.3);
+    --fc-neutral-text-color: #808080;
+    --fc-border-color: #ddd;
+
+    --fc-button-text-color: #fff;
+    --fc-button-bg-color: var(--primary);
+    --fc-button-border-color: var(--primary-foreground);
+    --fc-button-hover-bg-color: var(--rs-primary-600);
+    --fc-button-hover-border-color: var(--rs-primary-600);
+    --fc-button-active-bg-color: var(--primary);
+    --fc-button-active-border-color: var(--rs-primary-600);
+
+    --fc-event-bg-color: var(--primary);
+    --fc-event-border-color: var(--rs-primary-600);
+    --fc-event-text-color: #fff;
+    --fc-event-selected-overlay-color: rgba(0, 0, 0, 0.25);
+
+    --fc-more-link-bg-color: #d0d0d0;
+    --fc-more-link-text-color: inherit;
+
+    --fc-event-resizer-thickness: 8px;
+    --fc-event-resizer-dot-total-width: 8px;
+    --fc-event-resizer-dot-border-width: 1px;
+
+    --fc-non-business-color: var(--primary);
+    --fc-bg-event-color: var(--primary);
+    --fc-bg-event-opacity: 0.3;
+    --fc-highlight-color: rgba(188, 232, 241, 0.3);
+    --fc-today-bg-color: @apply bg-transparent;
+    --fc-now-indicator-color: red;
+    /* END FULLCALENDAR OVERRIDE */
+  }
+
+  .dark {
+    --background: hsl(222.2 84% 4.9%);
+    --foreground: hsl(210 40% 98%);
+
+    --card: hsl(222.2 84% 4.9%);
+    --card-foreground: hsl(210 40% 98%);
+
+    --popover: hsl(222.2 84% 4.9%);
+    --popover-foreground: hsl(210 40% 98%);
+
+    --primary: hsl(210 40% 98%);
+    --primary-foreground: hsl(222.2 47.4% 11.2%);
+
+    --secondary: hsl(217.2 32.6% 17.5%);
+    --secondary-foreground: hsl(210 40% 98%);
+
+    --muted: hsl(217.2 32.6% 17.5%);
+    --muted-foreground: hsl(215 20.2% 65.1%);
+
+    --accent: hsl(217.2 32.6% 17.5%);
+    --accent-foreground: hsl(210 40% 98%);
+
+    --destructive: hsl(0 62.8% 30.6%);
+    --destructive-foreground: hsl(210 40% 98%);
+
+    --border: hsl(217.2 32.6% 17.5%);
+    --input: hsl(217.2 32.6% 17.5%);
+    --ring: hsl(212.7 26.8% 83.9%);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Poppins', sans-serif;
+  }
+}
+
+/* SCROLLBAR */
+
+/* width */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* END SCROLLBAR */
+
+/* CUSTOM COMPONENTS */
+
+/* REACT DATEPICKER */
+.react-date-picker {
+  @apply w-full;
+  @apply font-sans;
+}
+
+.react-date-picker .react-date-picker__wrapper {
+  @apply h-10 w-full rounded-md border border-border bg-background px-3 py-2 font-sans text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+.react-date-picker .react-calendar {
+  @apply w-full border-border p-5 font-sans font-medium focus-visible:ring-offset-0;
+}
+
+/* END REACT DATEPICKER */
+
+/* REACT SUITE COMPONENTS */
+.rs-picker-daterange-menu {
+  @apply !z-[9999];
+  /* added a large random number, you can choose it more carefully based on your use-case.*/
+}
+
+/* END REACT SUITE COMPONENTS */
+
+/* REACT TOASTIFY */
+.Toastify * {
+  @apply font-sans;
+}
+
+/* END REACT TOASTIFY */
+
+/* FULLCALENDAR */
+.fc-h-event .fc-event-main-frame {
+  @apply !block;
+}
+
+/* END FULLCALENDAR */
+
+/* END CUSTOM COMPONENTS */
