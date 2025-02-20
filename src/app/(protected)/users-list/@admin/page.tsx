@@ -15,7 +15,7 @@ const Page = () => {
     <>
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-[2rem] font-bold">User List</h1>
-        <Button className="ml-auto" onClick={() => { setIsAddUserDialogOpen(true) }}>
+        <Button className="px-6 py-3.5 text-base font-medium text-white" onClick={() => { setIsAddUserDialogOpen(true) }}>
           <Plus className="mr-2" />Add User
         </Button>
       </div>

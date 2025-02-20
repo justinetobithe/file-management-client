@@ -99,7 +99,7 @@ export default function AppFoldersTable() {
 
     const columns: ColumnDef<Folder>[] = [
         {
-            accessorKey: 'created_at',
+            accessorKey: 'date_upload',
             header: ({ column }) => (
                 <Button
                     variant='ghost'
@@ -122,10 +122,8 @@ export default function AppFoldersTable() {
                 <Button
                     variant='ghost'
                     className='pl-0 text-left hover:!bg-transparent'
-                    onClick={() => column.toggleSorting()}
                 >
                     Department/s
-                    <ArrowUpDown className='ml-2 h-4 w-4' />
                 </Button>
             ),
             cell: ({ row }) => (
@@ -175,10 +173,8 @@ export default function AppFoldersTable() {
                 <Button
                     variant='ghost'
                     className='pl-0 text-left hover:!bg-transparent'
-                    onClick={() => column.toggleSorting()}
                 >
                     Files
-                    <ArrowUpDown className='ml-2 h-4 w-4' />
                 </Button>
             ),
             cell: ({ row }) => {
@@ -214,10 +210,8 @@ export default function AppFoldersTable() {
                 <Button
                     variant='ghost'
                     className='pl-0 text-left hover:!bg-transparent'
-                    onClick={() => column.toggleSorting()}
                 >
                     Size
-                    <ArrowUpDown className='ml-2 h-4 w-4' />
                 </Button>
             ),
             cell: ({ row }) => {
@@ -251,10 +245,8 @@ export default function AppFoldersTable() {
                 <Button
                     variant='ghost'
                     className='pl-0 text-left hover:!bg-transparent'
-                    onClick={() => column.toggleSorting()}
                 >
                     Coverage Period
-                    <ArrowUpDown className='ml-2 h-4 w-4' />
                 </Button>
             ),
             cell: ({ row }) => {
