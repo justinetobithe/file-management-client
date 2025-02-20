@@ -13,9 +13,9 @@ const Page = () => {
     return (
         <>
             <div className="flex justify-between items-center mb-4">
-                <h1 className="text-[2rem] font-bold">Folders</h1>
+                <h1 className="text-[2rem] font-bold">Files</h1>
                 <Button className="ml-auto" onClick={() => { setIsAddFolderDialogOpen(true) }}>
-                    <Plus className="mr-2" />Add Folder
+                    <Plus className="mr-2" />Add Files
                 </Button>
             </div>
             <AppFoldersTable />

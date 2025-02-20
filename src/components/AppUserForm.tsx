@@ -50,10 +50,8 @@ interface AppUserFormProps {
 }
 
 const roleOptions = [
-    { value: "admin", label: "admin" },
-    { value: "guard", label: "guard" },
-    { value: "parent", label: "parent" },
-    { value: "student", label: "student" },
+    { value: "admin", label: "Admin" },
+    { value: "user", label: "User" }, 
 ]
 
 const AppUserForm: FC<AppUserFormProps> = ({ data, isOpen, onClose, queryClient }) => {
@@ -100,17 +98,28 @@ const AppUserForm: FC<AppUserFormProps> = ({ data, isOpen, onClose, queryClient 
     const { mutate: createUser, isPending: isCreating } = useCreateUser();
     const { mutate: updateUser, isPending: isUpdating } = useUpdateUser();
 
-    const onSubmit = async (formData: UserInput) => {
+    const onSubmit = async (inputs: UserInput) => {
         setLoading(true);
+
+
+        const formData = new FormData();
+
+        Object.entries(inputs).forEach(([key, value]) => {
+            formData.append(key, value as string);
+        });
+
         if (data && data.id) {
-            await updateUser({ id: data.id, userData: formData }, {
+
+            formData.append('_method', 'PUT');
+
+            await updateUser({ id: data.id, userData: formData as any }, {
                 onSettled: () => {
                     onClose();
                     queryClient.invalidateQueries({ queryKey: ['users'] });
                 },
             });
         } else {
-            await createUser(formData, {
+            await createUser(formData as any, {
                 onSettled: () => {
                     onClose();
                     queryClient.invalidateQueries({ queryKey: ['users'] });

@@ -57,6 +57,12 @@ export const deleteFolder = async (id: number): Promise<Response> => {
     return response.data;
 };
 
+export const downloadZip = async (id: number): Promise<Response> => {
+    const response = await api.get(`/api/folder/${id}/download`);
+    return response.data;
+};
+
+
 export const useFolders = (
     page: number = 1,
     pageSize: number = 10,
@@ -130,6 +136,22 @@ export const useDeleteFolder = () => {
                     variant: 'success',
                     description: response.message,
                 });
+            }
+        },
+    });
+};
+
+export const useDownloadZip = () => {
+    return useMutation({
+        mutationFn: async (id: number) => {
+            return await downloadZip(id);
+        },
+        onSuccess: (response) => {
+            if (response && response.status === "success") {
+                // toast({
+                //     variant: 'success',
+                //     description: response.message,
+                // });
             }
         },
     });

@@ -62,7 +62,7 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
 
     const [loading, setLoading] = useState(false);
     const [files, setFiles] = useState<UploadedFile[]>([]);
-    const [currentFiles, setCurrentFiles] = useState<UploadedFile[]>(data?.files ?? []);
+    const [currentFiles, setCurrentFiles] = useState<UploadedFile[]>([]);
     const [removedFileIds, setRemovedFileIds] = useState<number[]>([]);
 
     const [departments, setDepartments] = useState<Department[]>([]);
@@ -106,17 +106,20 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
     });
 
     useEffect(() => {
-        if (data) {
+        if (isOpen) {
+            setFiles([]);
+            setCurrentFiles(data?.files ?? []);
+            setRemovedFileIds([]);
             form.reset({
-                folder_name: data.folder_name,
-                local_path: data.local_path,
-                start_date: data.start_date ? new Date(data.start_date) : null,
-                end_date: data.end_date ? new Date(data.end_date) : null,
-                department_id: data.departments?.map(dept => dept.id) ?? [],
-                parent_id: data.parent_id || undefined,
+                folder_name: data?.folder_name || '',
+                local_path: data?.local_path || '',
+                start_date: data?.start_date ? new Date(data.start_date) : null,
+                end_date: data?.end_date ? new Date(data.end_date) : null,
+                department_id: data?.departments?.map(dept => dept.id) ?? [],
+                parent_id: data?.parent_id || undefined,
             });
         }
-    }, [data, form]);
+    }, [isOpen, data, form]);
 
     const handleFileChange = (selectedFiles: FileList) => {
         const filesArray = Array.from(selectedFiles).map((file, index) => ({

@@ -49,12 +49,20 @@ export const useUsers = (
   });
 
 export const createUser = async (inputs: UserInput): Promise<Response> => {
-  const response = await api.post<Response>(`/api/user`, inputs);
+  const response = await api.post<Response>(`/api/user`, inputs, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
   return response.data;
 };
 
 export const updateUser = async (id: string, inputs: UserInput | ProfileFormInputs): Promise<Response> => {
-  const response = await api.put<Response>(`/api/user/${id}`, inputs);
+  const response = await api.post<Response>(`/api/user/${id}`, inputs, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
   return response.data;
 };
 

@@ -125,10 +125,8 @@ const inputSchema = z
 export type ProfileFormInputs = z.infer<typeof inputSchema>;
 
 const roleOptions = [
-  { value: "admin", label: "admin" },
-  { value: "driver", label: "driver" },
-  { value: "operator", label: "operator" },
-  { value: "passenger", label: "passenger" },
+  { value: "admin", label: "Admin" },
+  { value: "user", label: "User" },
 ]
 
 const ProfileForm: FC<{ user: User }> = ({ user }) => {
@@ -149,12 +147,26 @@ const ProfileForm: FC<{ user: User }> = ({ user }) => {
   const { mutate, isPending } = useUpdateUser();
 
   const onSubmit = (inputs: ProfileFormInputs) => {
+    const formData = new FormData();
+
+    Object.entries(inputs).forEach(([key, value]) => {
+      if (value !== null && value !== undefined) {
+        formData.append(key, value);
+      }
+    });
+
+    if (inputs.image instanceof File) {
+      formData.append('image', inputs.image);
+    }
+
+    formData.append('_method', 'PUT');
 
     mutate({
       id: user.id,
-      userData: inputs,
+      userData: formData as any,
     });
   };
+
 
   useEffect(() => {
     if (user && user.image) {
@@ -178,8 +190,8 @@ const ProfileForm: FC<{ user: User }> = ({ user }) => {
               <div className='flex flex-col items-center sm:flex-row sm:space-x-5'>
                 <Avatar className='h-[120px] w-[120px]'>
                   <AvatarImage
-                    src={image}
-                    alt='AVATAR'
+                    src={`${process.env.NEXT_PUBLIC_API_URL || ''}/storage/image/${user?.image}`}
+                    alt={user?.image as string}
                     className='object-cover'
                   />
                   <AvatarFallback className='text-3xl font-medium'>
@@ -304,6 +316,7 @@ const ProfileForm: FC<{ user: User }> = ({ user }) => {
                       </FormItem>
                     )}
                   />
+
                   <FormField
                     control={form.control}
                     name='role'
@@ -316,7 +329,7 @@ const ProfileForm: FC<{ user: User }> = ({ user }) => {
                             name="role"
                             render={({ field }) => (
                               <Select
-                                value={roleOptions.find(option => option.value === field.value) || null}
+                                defaultValue={roleOptions.find(option => option.value === field.value) || null}
                                 onChange={(option) => {
                                   field.onChange(option?.value);
                                 }}

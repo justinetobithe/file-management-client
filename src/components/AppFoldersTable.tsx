@@ -16,15 +16,18 @@ import {
 } from "@/components/ui/tooltip";
 import { Skeleton } from '@/components/ui/skeleton';
 import AppTable from '@/components/AppTable';
-import { ArrowUpDown, Pencil, Trash } from 'lucide-react';
+import { ArrowUpDown, Pencil, Trash, Download, Search } from 'lucide-react';
 import { Folder } from '@/types/Folder';
-import { useDeleteFolder, useFolders, useUpdateFolder } from '@/lib/FolderAPI';
+import { useDeleteFolder, useFolders, useUpdateFolder, useDownloadZip } from '@/lib/FolderAPI';
 import { useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import Link from 'next/link';
 import { formatFileSize } from '@/utils/fileSizeFormatter';
 import AppConfirmationDialog from './AppConfirmationDialog';
 import AppFolderForm from './AppFolderForm';
+import { Badge } from './ui/badge';
+import { Input } from './ui/input';
+import debounce from 'lodash.debounce';
 
 export default function AppFoldersTable() {
     const queryClient = useQueryClient();
@@ -37,6 +40,15 @@ export default function AppFoldersTable() {
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
 
+    const debouncedSetSearchKeyword = React.useCallback(
+        debounce((value: string) => setSearchKeyword(value), 300),
+        []
+    );
+
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        debouncedSetSearchKeyword(event.target.value);
+    };
+
     const { data, isLoading } = useFolders(
         pageIndex + 1,
         pageSize,
@@ -47,6 +59,7 @@ export default function AppFoldersTable() {
 
     const { mutate } = useDeleteFolder();
     const { mutate: updateFolder } = useUpdateFolder();
+    const { mutate: downloadZip } = useDownloadZip();
 
     const handleEditFolder = (folder: Folder) => {
         setSelectedFolder(folder);
@@ -60,6 +73,29 @@ export default function AppFoldersTable() {
             }
         });
     };
+
+    const handleDownloadZip = async (folder: Folder) => {
+        downloadZip(folder.id!, {
+            onSuccess: (response) => {
+                if (!response || typeof response.data !== 'string') {
+                    console.error('Invalid response format:', response);
+                    return;
+                }
+
+                const url = response.data;
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `${folder.folder_name}.zip`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            },
+            onError: (error) => {
+                console.error('Error downloading zip:', error);
+            },
+        });
+    };
+
 
     const columns: ColumnDef<Folder>[] = [
         {
@@ -75,8 +111,8 @@ export default function AppFoldersTable() {
                 </Button>
             ),
             cell: ({ row }) =>
-                row.original.start_date && row.original.end_date
-                    ? `${format(new Date(row.original.start_date), "MMM dd, yyyy")} - ${format(new Date(row.original.end_date), "MMM dd, yyyy")}`
+                row.original.created_at
+                    ? `${format(new Date(row.original.created_at), "MMM dd, yyyy")}`
                     : "",
             enableSorting: true,
         },
@@ -92,7 +128,15 @@ export default function AppFoldersTable() {
                     <ArrowUpDown className='ml-2 h-4 w-4' />
                 </Button>
             ),
-            cell: ({ row }) => row.original.departments?.map(d => d.name).join(", "),
+            cell: ({ row }) => (
+                <div className="flex flex-wrap gap-2">
+                    {row.original.departments?.map((d, index) => (
+                        <Badge key={index} variant="outline" className="px-2 py-1">
+                            {d.name}
+                        </Badge>
+                    ))}
+                </div>
+            ),
             enableSorting: true,
         },
         {
@@ -103,7 +147,7 @@ export default function AppFoldersTable() {
                     className='pl-0 text-left hover:!bg-transparent'
                     onClick={() => column.toggleSorting()}
                 >
-                    File Name
+                    Folder Name (Main)
                     <ArrowUpDown className='ml-2 h-4 w-4' />
                 </Button>
             ),
@@ -118,7 +162,7 @@ export default function AppFoldersTable() {
                     className='pl-0 text-left hover:!bg-transparent'
                     onClick={() => column.toggleSorting()}
                 >
-                    SubFolders
+                    Folder Name (Sub)
                     <ArrowUpDown className='ml-2 h-4 w-4' />
                 </Button>
             ),
@@ -140,22 +184,26 @@ export default function AppFoldersTable() {
             cell: ({ row }) => {
                 const { files } = row.original;
                 return (
-                    <>
+                    <div className="flex flex-col gap-1">
                         {files && files.length > 0 ? (
                             files.map((file, index) => (
-                                <div key={index} className="mb-3">
-                                    <Link className="color-primary" href={(process.env.NEXT_PUBLIC_API_URL || '') + "/storage/" + file.path} target="_blank" rel="noopener noreferrer">
-                                        {file.filename}
-                                    </Link>
-                                    <p className="text-xs">
-                                        {format(new Date(file.created_at), 'd/MM/yyyy')}
-                                    </p>
+                                <div key={index} className="inline-flex">
+                                    <Badge variant="secondary" className="px-3 py-1 text-sm w-fit">
+                                        <Link
+                                            href={`${process.env.NEXT_PUBLIC_API_URL || ''}/storage/${file.path}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="whitespace-nowrap"
+                                        >
+                                            {file.filename}
+                                        </Link>
+                                    </Badge>
                                 </div>
                             ))
                         ) : (
                             <span>No files available</span>
                         )}
-                    </>
+                    </div>
                 );
             },
             enableSorting: true,
@@ -242,6 +290,7 @@ export default function AppFoldersTable() {
                             </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
+
                     <AppConfirmationDialog
                         title='Delete Folder'
                         description={`Are you sure you want to delete the folder "${row.original.folder_name}"? This action cannot be undone.`}
@@ -252,6 +301,26 @@ export default function AppFoldersTable() {
                         }
                         handleDialogAction={() => handleDeleteFolder(row.original.id!)}
                     />
+
+
+
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    type='button'
+                                    variant="secondary"
+                                    className="ml-2"
+                                    onClick={() => handleDownloadZip(row.original)}
+                                >
+                                    <Download className="h-4 w-4" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>Download as ZIP</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
                 </div>
             ),
             enableSorting: false,
@@ -283,6 +352,15 @@ export default function AppFoldersTable() {
 
     return (
         <div>
+            <div className="relative w-full max-w-xs">
+                <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                <Input
+                    type="text"
+                    placeholder="Search..."
+                    className="pl-10"
+                    onChange={handleSearchChange}
+                />
+            </div>
             <AppTable table={table} />
             {selectedFolder && (
                 <AppFolderForm
