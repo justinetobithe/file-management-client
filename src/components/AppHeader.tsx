@@ -7,7 +7,7 @@ import Image from "next/image";
 import AppNavBurger from "./AppNavBurger";
 import { Bell, LogOut, User } from "lucide-react";
 import { Session } from "next-auth";
-import { getSession } from "next-auth/react";
+import { getSession, signOut } from "next-auth/react";
 
 const AppHeader = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -21,7 +21,7 @@ const AppHeader = () => {
     fetchSession();
   }, []);
 
-  const toggleDropdown = () => setDropdownOpen(prev => !prev);
+  const toggleDropdown = () => setDropdownOpen((prev) => !prev);
 
   return (
     <ul className="flex items-center justify-center bg-white px-5 py-3 shadow-md">
@@ -33,39 +33,38 @@ const AppHeader = () => {
         </Link>
       </li>
 
-      <li className='ml-auto inline-block'>
-        <div className='flex items-center space-x-3'> 
-
-          <span className='hidden text-[0.8rem] font-bold sm:inline'>
-            {session?.user.name}
+      <li className="ml-auto inline-block">
+        <div className="flex items-center space-x-3">
+          <span className="hidden text-[0.8rem] font-bold sm:inline">
+            {session?.user?.name}
           </span>
 
-          <div className='relative'>
-            <Avatar onClick={toggleDropdown}>
+          <div className="relative">
+            <Avatar onClick={toggleDropdown} className="cursor-pointer">
               <AvatarImage
-                src={session?.user.image ?? undefined}
-                alt='@shadcn'
-                className='object-cover'
+                src={session?.user?.image ?? undefined}
+                alt="@shadcn"
+                className="object-cover"
               />
               <AvatarFallback>
-                {session?.user.name?.charAt(0).toUpperCase()}
+                {session?.user?.name?.charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
 
             {dropdownOpen && (
-              <div className='absolute right-0 mt-2 bg-white shadow-lg rounded-md w-48 py-2'>
+              <div className="absolute right-0 mt-2 bg-white shadow-lg rounded-md w-48 py-2">
                 <Link
-                  href='/profile'
-                  className='block px-4 py-2 text-gray-700 hover:bg-gray-100'
+                  href="/profile"
+                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                 >
                   Profile
                 </Link>
-                <Link
-                  href='/logout'
-                  className='block px-4 py-2 text-gray-700 hover:bg-gray-100'
+                <button
+                  onClick={() => signOut()}
+                  className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
                 >
                   Logout
-                </Link>
+                </button>
               </div>
             )}
           </div>

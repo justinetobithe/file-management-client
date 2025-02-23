@@ -29,7 +29,13 @@ import { Badge } from './ui/badge';
 import { Input } from './ui/input';
 import debounce from 'lodash.debounce';
 
-export default function AppFoldersTable() {
+interface AppFoldersTableProps {
+    setSelectedFolders: React.Dispatch<React.SetStateAction<number[]>>;
+    selectedFolders: number[];
+}
+
+export default function AppFoldersTable({ setSelectedFolders, selectedFolders }: AppFoldersTableProps) {
+
     const queryClient = useQueryClient();
     const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
         pageIndex: 0,
@@ -39,6 +45,7 @@ export default function AppFoldersTable() {
     const [sorting, setSorting] = useState<SortingState>([]);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
+
 
     const debouncedSetSearchKeyword = React.useCallback(
         debounce((value: string) => setSearchKeyword(value), 300),
@@ -96,8 +103,42 @@ export default function AppFoldersTable() {
         });
     };
 
+    const handleCheckboxChange = (id: number) => {
+        setSelectedFolders((prevSelected: number[]) =>
+            prevSelected.includes(id)
+                ? prevSelected.filter((folderId: number) => folderId !== id)
+                : [...prevSelected, id]
+        );
+    };
 
     const columns: ColumnDef<Folder>[] = [
+        {
+            id: "select",
+            header: () => (
+                <input
+                    type="checkbox"
+                    onChange={(e) => {
+                        const allIds: number[] =
+                            data?.data
+                                .map((folder) => folder.id)
+                                .filter((id): id is number => id !== undefined) || [];
+                        setSelectedFolders(e.target.checked ? allIds : []);
+                    }}
+                    checked={selectedFolders.length === (data?.data.length || 0)}
+                />
+            ),
+            cell: ({ row }) => (
+                <input
+                    type="checkbox"
+                    checked={selectedFolders.includes(row.original.id!)}
+                    onChange={() => {
+                        if (row.original.id !== undefined) {
+                            handleCheckboxChange(row.original.id);
+                        }
+                    }}
+                />
+            ),
+        },
         {
             accessorKey: 'date_upload',
             header: ({ column }) => (

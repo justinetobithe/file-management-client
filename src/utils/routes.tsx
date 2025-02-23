@@ -9,7 +9,8 @@ import {
   FileText,
   FileArchive,
   File,
-  Folder
+  Folder,
+  UserRoundCheck
 } from 'lucide-react';
 
 interface Route {
@@ -38,18 +39,18 @@ const routes: Route[] = [
     child_routes: [],
   },
   {
-    route: '/files',
-    title: 'Files',
-    icon: <Folder />,
-    roles: ['admin', 'user'],
+    route: '/designations',
+    title: 'Designations',
+    icon: <UserRoundCheck />,
+    roles: ['admin'],
     isSidebarVisible: true,
     child_routes: [],
   },
   {
-    route: '/reports',
-    title: 'Reports',
-    icon: <FileArchive />,
-    roles: ['admin'],
+    route: '/files',
+    title: 'Files',
+    icon: <Folder />,
+    roles: ['admin', 'user'],
     isSidebarVisible: true,
     child_routes: [],
   },

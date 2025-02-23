@@ -79,7 +79,8 @@ const inputSchema = z
       .transform((v) => v ?? ''),
     image: z
       .any()
-      .refine((file: File | string) => {
+      .refine((file: File | string | null) => {
+        if (!file) return false;
         if (typeof file === 'string') return true;
         return file instanceof File && convertBtoMb(file.size) <= MAX_FILE_SIZE;
       }, strings.validation.max_image_size)
@@ -87,8 +88,7 @@ const inputSchema = z
         if (typeof file === 'string') return true;
         return file && ACCEPTED_IMAGE_TYPES.includes(file?.type);
       }, strings.validation.allowed_image_formats)
-      .nullish()
-      .transform((v) => (typeof v === 'string' ? '' : v)),
+      .transform((v) => (typeof v === 'string' ? v : v || '')),
     role: z.string().min(1, { message: strings.validation.required }),
   })
   .refine(
@@ -169,13 +169,13 @@ const ProfileForm: FC<{ user: User }> = ({ user }) => {
 
 
   useEffect(() => {
+    console.log("User data:", user);
     if (user && user.image) {
-      setImage(user.image);
+      setImage(`${process.env.NEXT_PUBLIC_API_URL || ''}/storage/image/${user?.image}`);
     } else {
       setImage('');
     }
   }, [user]);
-
 
   return (
     <>
@@ -189,11 +189,20 @@ const ProfileForm: FC<{ user: User }> = ({ user }) => {
             <CardHeader className='border-b-[1px] border-[#F0F0F0]'>
               <div className='flex flex-col items-center sm:flex-row sm:space-x-5'>
                 <Avatar className='h-[120px] w-[120px]'>
-                  <AvatarImage
-                    src={`${process.env.NEXT_PUBLIC_API_URL || ''}/storage/image/${user?.image}`}
-                    alt={user?.image as string}
-                    className='object-cover'
-                  />
+                  {image ? (
+                    <AvatarImage
+                      src={image}
+                      alt={image as string}
+                      className='object-cover'
+                    />
+                  ) : (
+                    <AvatarImage
+                      src={`${process.env.NEXT_PUBLIC_API_URL || ''}/storage/image/${user?.image}`}
+                      alt={"User Image"}
+                      className='object-cover'
+                    />
+                  )}
+
                   <AvatarFallback className='text-3xl font-medium'>
                     {user?.first_name}
                   </AvatarFallback>
@@ -226,11 +235,13 @@ const ProfileForm: FC<{ user: User }> = ({ user }) => {
                               imageRef.current = ref;
                             }}
                             onChange={(e) => {
-                              if (e.target.files) {
-                                onChange(e.target.files && e.target.files[0]);
-                                setImage(
-                                  URL.createObjectURL(e.target.files[0])
-                                );
+                              if (e.target.files?.length) {
+                                const file = e.target.files[0];
+                                onChange(file);
+
+                                setImage(URL.createObjectURL(file));
+
+                                e.target.value = '';
                               }
                             }}
                             value=''
@@ -281,24 +292,24 @@ const ProfileForm: FC<{ user: User }> = ({ user }) => {
                     )}
                   />
                 </div>
-                <FormField
-                  control={form.control}
-                  name='email'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input
-                          type='email'
-                          {...field}
-                          className='border-primary focus-visible:ring-offset-0'
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
                 <div className='grid gap-x-10 sm:grid-cols-2'>
+                  <FormField
+                    control={form.control}
+                    name='email'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input
+                            type='email'
+                            {...field}
+                            className='border-primary focus-visible:ring-offset-0'
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   <FormField
                     control={form.control}
                     name='phone'
@@ -317,6 +328,8 @@ const ProfileForm: FC<{ user: User }> = ({ user }) => {
                     )}
                   />
 
+                </div>
+                <div className='grid gap-x-10 sm:grid-cols-3'>
                   <FormField
                     control={form.control}
                     name='role'
@@ -350,10 +363,10 @@ const ProfileForm: FC<{ user: User }> = ({ user }) => {
                         ) : (
                           <FormControl>
                             <Input
-                              type='text'
-                              value={user.role}
+                              type="text"
+                              value={user.role.charAt(0).toUpperCase() + user.role.slice(1)}
                               disabled
-                              className='border-primary focus-visible:ring-offset-0'
+                              className="border-primary focus-visible:ring-offset-0"
                             />
                           </FormControl>
                         )}
@@ -361,6 +374,29 @@ const ProfileForm: FC<{ user: User }> = ({ user }) => {
                       </FormItem>
                     )}
                   />
+
+                  <FormItem>
+                    <FormLabel>Department</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        value={user.department?.name}
+                        disabled
+                        className="border-primary focus-visible:ring-offset-0"
+                      />
+                    </FormControl>
+                  </FormItem>
+                  <FormItem>
+                    <FormLabel>Designation</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        value={user.designation?.designation}
+                        disabled
+                        className="border-primary focus-visible:ring-offset-0"
+                      />
+                    </FormControl>
+                  </FormItem>
                 </div>
                 <FormField
                   control={form.control}

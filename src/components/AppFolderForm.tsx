@@ -28,6 +28,7 @@ import { X, } from 'lucide-react';
 import { Department } from '@/types/Department';
 import { api } from '@/lib/api';
 import Select from 'react-select';
+import User from '@/types/User';
 
 const folderSchema = z.object({
     id: z.number().optional(),
@@ -58,8 +59,6 @@ interface AppFolderFormProps {
 
 const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryClient }) => {
 
-    console.log("data", data)
-
     const [loading, setLoading] = useState(false);
     const [files, setFiles] = useState<UploadedFile[]>([]);
     const [currentFiles, setCurrentFiles] = useState<UploadedFile[]>([]);
@@ -67,6 +66,21 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
 
     const [departments, setDepartments] = useState<Department[]>([]);
     const [folders, setFolders] = useState<Folder[]>([]);
+
+    const [user, setUser] = useState<User | null>(null);
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const { data } = await api.get<{ data: User }>('/api/me');
+                setUser(data.data);
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        };
+
+        fetchUser();
+    }, []);
 
     useEffect(() => {
         const fetchDepartments = async () => {
@@ -104,6 +118,12 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
             parent_id: data?.parent_id || undefined,
         },
     });
+
+    useEffect(() => {
+        if (user && user.department_id) {
+            form.setValue("department_id", [user.department_id]);
+        }
+    }, [user, form]);
 
     useEffect(() => {
         if (isOpen) {
@@ -299,18 +319,12 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
                                                     isMulti
                                                     value={departments
                                                         .filter(dept => field.value?.includes(dept.id!))
-                                                        .map(dept => ({
-                                                            value: dept.id,
-                                                            label: dept.name,
-                                                        }))
-                                                    }
+                                                        .map(dept => ({ value: dept.id, label: dept.name }))}
+                                                    onChange={(selected) => field.onChange(selected.map(option => option.value))}
                                                     options={departments.map(dept => ({
                                                         value: dept.id,
                                                         label: dept.name,
                                                     }))}
-                                                    onChange={selectedOptions =>
-                                                        field.onChange(selectedOptions.map(option => option.value))
-                                                    }
                                                     isClearable
                                                 />
                                             )}

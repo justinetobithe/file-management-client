@@ -17,14 +17,13 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import AppTable from '@/components/AppTable';
 import { ArrowUpDown, Pencil, Trash } from 'lucide-react';
-import { Department } from '@/types/Department';
-import { useDeleteDepartment, useUpdateDepartment, useDepartments } from '@/lib/DepartmentAPI';
+import { Designation } from '@/types/Designation';
+import { useDeleteDesignation, useDesignations, useUpdateDesignation } from '@/lib/DesignationAPI';
 import AppConfirmationDialog from './AppConfirmationDialog';
-import { toast } from '@/components/ui/use-toast';
-import AppDepartmentForm from './AppDepartmentForm';
+import AppDesignationForm from './AppDesignationForm';
 import { useQueryClient } from '@tanstack/react-query';
 
-export default function AppDepartmentTable() {
+export default function AppDesignationTable() {
     const queryClient = useQueryClient();
     const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
         pageIndex: 0,
@@ -33,9 +32,9 @@ export default function AppDepartmentTable() {
     const [searchKeyword, setSearchKeyword] = React.useState('');
     const [sorting, setSorting] = useState<SortingState>([]);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-    const [selectedDepartment, setSelectedDepartment] = useState<Department | null>(null);
+    const [selectedDesignation, setSelectedDesignation] = useState<Designation | null>(null);
 
-    const { data, isLoading } = useDepartments(
+    const { data, isLoading } = useDesignations(
         pageIndex + 1,
         pageSize,
         searchKeyword,
@@ -43,36 +42,51 @@ export default function AppDepartmentTable() {
         Boolean(sorting.map((item) => item.desc).join(','))
     );
 
-    const { mutate } = useDeleteDepartment();
-    const { mutate: updateDepartment } = useUpdateDepartment();
+    const { mutate } = useDeleteDesignation();
+    const { mutate: updateDesignation } = useUpdateDesignation();
 
-    const handleEditDepartment = (department: Department) => {
-        setSelectedDepartment(department);
+    const handleEditDesignation = (designation: Designation) => {
+        setSelectedDesignation(designation);
         setIsEditDialogOpen(true);
     };
 
-    const handleDeleteDepartment = (id: number) => {
+    const handleDeleteDesignation = (id: number) => {
         mutate(id, {
             onSettled: () => {
-                queryClient.invalidateQueries({ queryKey: ['departments'] });
+                queryClient.invalidateQueries({ queryKey: ['designations'] });
             }
         });
     };
 
-    const columns: ColumnDef<Department>[] = [
+    const columns: ColumnDef<Designation>[] = [
         {
-            accessorKey: 'name',
+            accessorKey: 'designation',
             header: ({ column }) => (
                 <Button
                     variant='ghost'
                     className='pl-0 text-left hover:!bg-transparent font-bold'
                     onClick={() => column.toggleSorting()}
                 >
-                    Name
+                    Designation
                     <ArrowUpDown className='ml-2 h-4 w-4' />
                 </Button>
             ),
-            cell: ({ row }) => row.original.name,
+            cell: ({ row }) => row.original.designation,
+            enableSorting: true,
+        },
+        {
+            accessorKey: 'description',
+            header: ({ column }) => (
+                <Button
+                    variant='ghost'
+                    className='pl-0 text-left hover:!bg-transparent font-bold'
+                    onClick={() => column.toggleSorting()}
+                >
+                    Description
+                    <ArrowUpDown className='ml-2 h-4 w-4' />
+                </Button>
+            ),
+            cell: ({ row }) => row.original.description,
             enableSorting: true,
         },
         {
@@ -87,7 +101,7 @@ export default function AppDepartmentTable() {
                                     type='button'
                                     variant="outline"
                                     className="mr-2"
-                                    onClick={() => handleEditDepartment(row.original)}
+                                    onClick={() => handleEditDesignation(row.original)}
                                 >
                                     <Pencil className="h-4 w-4" />
                                 </Button>
@@ -98,14 +112,14 @@ export default function AppDepartmentTable() {
                         </Tooltip>
                     </TooltipProvider>
                     <AppConfirmationDialog
-                        title='Delete Department'
-                        description={`Are you sure you want to delete the department "${row.original.name}"? This action cannot be undone.`}
+                        title='Delete Designation'
+                        description={`Are you sure you want to delete the designation "${row.original.designation}"? This action cannot be undone.`}
                         buttonElem={
                             <Button className="text-white" variant="destructive" type='button'>
                                 <Trash size={20} />
                             </Button>
                         }
-                        handleDialogAction={() => handleDeleteDepartment(row.original.id!)}
+                        handleDialogAction={() => handleDeleteDesignation(row.original.id!)}
                     />
                 </div>
             ),
@@ -139,9 +153,9 @@ export default function AppDepartmentTable() {
     return (
         <div>
             <AppTable table={table} />
-            {selectedDepartment && (
-                <AppDepartmentForm
-                    data={selectedDepartment}
+            {selectedDesignation && (
+                <AppDesignationForm
+                    data={selectedDesignation}
                     isOpen={isEditDialogOpen}
                     onClose={() => setIsEditDialogOpen(false)}
                     queryClient={queryClient}

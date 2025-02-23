@@ -15,7 +15,7 @@ const Page = () => {
     <>
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-[2rem] font-bold">Departments</h1>
-        <Button className="ml-auto" onClick={() => { setIsAddDepartmentDialogOpen(true) }}>
+        <Button className="px-6 py-3.5 text-base font-medium text-white" onClick={() => { setIsAddDepartmentDialogOpen(true) }}>
           <Plus className="mr-2" />Add Department
         </Button>
       </div>

@@ -47,7 +47,7 @@ export default function AppAuditLogsTable() {
             header: ({ column }) => (
                 <Button
                     variant='ghost'
-                    className='pl-0 text-left hover:!bg-transparent'
+                    className='pl-0 text-left hover:!bg-transparent font-bold'
                     onClick={() => column.toggleSorting()}
                 >
                     Date
@@ -65,7 +65,7 @@ export default function AppAuditLogsTable() {
             header: () => (
                 <Button
                     variant='ghost'
-                    className='pl-0 text-left hover:!bg-transparent'
+                    className='pl-0 text-left hover:!bg-transparent font-bold'
                 >
                     Time
                 </Button>
@@ -80,7 +80,7 @@ export default function AppAuditLogsTable() {
             header: () => (
                 <Button
                     variant='ghost'
-                    className='pl-0 text-left hover:!bg-transparent'
+                    className='pl-0 text-left hover:!bg-transparent font-bold'
                 >
                     User
                 </Button>
@@ -95,7 +95,7 @@ export default function AppAuditLogsTable() {
             header: () => (
                 <Button
                     variant='ghost'
-                    className='pl-0 text-left hover:!bg-transparent'
+                    className='pl-0 text-left hover:!bg-transparent font-bold'
                 >
                     Change Type
                 </Button>
@@ -110,7 +110,7 @@ export default function AppAuditLogsTable() {
             header: () => (
                 <Button
                     variant='ghost'
-                    className='pl-0 text-left hover:!bg-transparent'
+                    className='pl-0 text-left hover:!bg-transparent font-bold'
                 >
                     Record Type
                 </Button>
@@ -125,7 +125,7 @@ export default function AppAuditLogsTable() {
             header: () => (
                 <Button
                     variant='ghost'
-                    className='pl-0 text-left hover:!bg-transparent'
+                    className='pl-0 text-left hover:!bg-transparent font-bold'
                 >
                     Record ID
                 </Button>
@@ -140,7 +140,7 @@ export default function AppAuditLogsTable() {
             header: () => (
                 <Button
                     variant='ghost'
-                    className='pl-0 text-left hover:!bg-transparent'
+                    className='pl-0 text-left hover:!bg-transparent font-bold'
                 >
                     Old Value
                 </Button>
@@ -155,7 +155,7 @@ export default function AppAuditLogsTable() {
             header: () => (
                 <Button
                     variant='ghost'
-                    className='pl-0 text-left hover:!bg-transparent'
+                    className='pl-0 text-left hover:!bg-transparent font-bold'
                 >
                     New Value
                 </Button>
@@ -170,7 +170,7 @@ export default function AppAuditLogsTable() {
             header: () => (
                 <Button
                     variant='ghost'
-                    className='pl-0 text-left hover:!bg-transparent'
+                    className='pl-0 text-left hover:!bg-transparent font-bold'
                 >
                     Message
                 </Button>

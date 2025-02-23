@@ -1,4 +1,5 @@
 import { Department } from "./Department";
+import { Designation } from "./Designation";
 
 // MAIN
 export default interface User {
@@ -16,7 +17,11 @@ export default interface User {
   email_verified?: Date | null;
   status?: number;
 
+  department_id?: number;
+  designation_id?: number;
+
   department?: Department;
+  designation?: Designation;
 }
 
 
