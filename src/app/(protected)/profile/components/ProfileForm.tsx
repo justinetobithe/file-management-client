@@ -78,15 +78,15 @@ const inputSchema = z
       .nullish()
       .transform((v) => v ?? ''),
     image: z
-      .any()
-      .refine((file: File | string | null) => {
+      .union([z.instanceof(File), z.string(), z.null()])
+      .refine((file) => {
         if (!file) return false;
         if (typeof file === 'string') return true;
         return file instanceof File && convertBtoMb(file.size) <= MAX_FILE_SIZE;
       }, strings.validation.max_image_size)
-      .refine((file: File | string) => {
+      .refine((file) => {
         if (typeof file === 'string') return true;
-        return file && ACCEPTED_IMAGE_TYPES.includes(file?.type);
+        return file instanceof File && ACCEPTED_IMAGE_TYPES.includes(file?.type);
       }, strings.validation.allowed_image_formats)
       .transform((v) => (typeof v === 'string' ? v : v || '')),
     role: z.string().min(1, { message: strings.validation.required }),
@@ -135,6 +135,7 @@ const ProfileForm: FC<{ user: User }> = ({ user }) => {
     resolver: zodResolver(inputSchema),
     defaultValues: {
       ...user,
+      image: user.image ?? "",
     },
   });
 
@@ -147,23 +148,10 @@ const ProfileForm: FC<{ user: User }> = ({ user }) => {
   const { mutate, isPending } = useUpdateUser();
 
   const onSubmit = (inputs: ProfileFormInputs) => {
-    const formData = new FormData();
-
-    Object.entries(inputs).forEach(([key, value]) => {
-      if (value !== null && value !== undefined) {
-        formData.append(key, value);
-      }
-    });
-
-    if (inputs.image instanceof File) {
-      formData.append('image', inputs.image);
-    }
-
-    formData.append('_method', 'PUT');
 
     mutate({
       id: user.id,
-      userData: formData as any,
+      userData: inputs,
     });
   };
 

@@ -28,7 +28,6 @@ import Image from 'next/image';
 import { useGoogleLogin } from '@react-oauth/google';
 import { api } from '@/lib/api';
 import log from '@/utils/logger';
-import GoogleIcon from '@public/img/google-icon.png';
 
 const inputSchema = z
   .object({
@@ -108,7 +107,7 @@ const inputSchema = z
       if (moment().diff(dob, 'years') < 16) {
         return false;
       }
-      
+
       return true;
     },
     {
@@ -262,14 +261,6 @@ const RegisterForm: FC = () => {
         onClick={() => signUpWithGoogle()}
         variant='outline'
       >
-        <div className='relative mr-3 h-[1.2rem] w-[1.2rem]'>
-          <Image
-            alt='GOOGLE ICON'
-            src={GoogleIcon}
-            fill={true}
-            className='object-contain'
-          />
-        </div>
         <span className='text-lg font-bold'>Sign Up with Google</span>
       </Button>
       <div className='relative flex w-full items-center py-5'>
@@ -426,22 +417,20 @@ const RegisterForm: FC = () => {
                 <div className='inline-block flex-1 space-x-2 text-right'>
                   <Button
                     onClick={() => form.setValue('user_role', 'mother')}
-                    variant={`${
-                      form.getValues('user_role') == 'mother'
+                    variant={`${form.getValues('user_role') == 'mother'
                         ? 'default'
                         : 'ghost'
-                    }`}
+                      }`}
                     type='button'
                   >
                     Mother
                   </Button>
                   <Button
                     onClick={() => form.setValue('user_role', 'ob_gyne')}
-                    variant={`${
-                      form.getValues('user_role') == 'ob_gyne'
+                    variant={`${form.getValues('user_role') == 'ob_gyne'
                         ? 'default'
                         : 'ghost'
-                    }`}
+                      }`}
                     type='button'
                   >
                     OB-Gyne

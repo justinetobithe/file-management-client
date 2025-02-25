@@ -57,14 +57,15 @@ export const createUser = async (inputs: UserInput): Promise<Response> => {
   return response.data;
 };
 
-export const updateUser = async (id: string, inputs: UserInput | ProfileFormInputs): Promise<Response> => {
+export const updateUser = async (id: string, inputs: UserInput | ProfileFormInputs | FormData): Promise<Response> => {
   const response = await api.post<Response>(`/api/user/${id}`, inputs, {
     headers: {
-      'Content-Type': 'multipart/form-data',
+      'Content-Type': inputs instanceof FormData ? 'multipart/form-data' : 'application/json',
     },
   });
   return response.data;
 };
+
 
 export const deleteUser = async (id: string): Promise<Response> => {
   const response = await api.delete(`/api/user/${id}`);

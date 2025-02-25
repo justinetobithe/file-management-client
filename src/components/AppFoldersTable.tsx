@@ -49,7 +49,7 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
 
     const debouncedSetSearchKeyword = React.useCallback(
         debounce((value: string) => setSearchKeyword(value), 300),
-        []
+        [setSearchKeyword]
     );
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {

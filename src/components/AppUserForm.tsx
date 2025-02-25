@@ -117,28 +117,17 @@ const AppUserForm: FC<AppUserFormProps> = ({ data, isOpen, onClose, queryClient 
     const { mutate: createUser, isPending: isCreating } = useCreateUser();
     const { mutate: updateUser, isPending: isUpdating } = useUpdateUser();
 
-    const onSubmit = async (inputs: UserInput) => {
+    const onSubmit = async (formData: UserInput) => {
         setLoading(true);
-
-
-        const formData = new FormData();
-
-        Object.entries(inputs).forEach(([key, value]) => {
-            formData.append(key, value as string);
-        });
-
         if (data && data.id) {
-
-            formData.append('_method', 'PUT');
-
-            await updateUser({ id: data.id, userData: formData as any }, {
+            await updateUser({ id: data.id, userData: formData }, {
                 onSettled: () => {
                     onClose();
                     queryClient.invalidateQueries({ queryKey: ['users'] });
                 },
             });
         } else {
-            await createUser(formData as any, {
+            await createUser(formData, {
                 onSettled: () => {
                     onClose();
                     queryClient.invalidateQueries({ queryKey: ['users'] });
@@ -147,6 +136,7 @@ const AppUserForm: FC<AppUserFormProps> = ({ data, isOpen, onClose, queryClient 
         }
         setLoading(false);
     };
+
 
     return (
         <AlertDialog open={isOpen}>
