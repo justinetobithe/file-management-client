@@ -238,11 +238,12 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
                 </Button>
             ),
             cell: ({ row }) => {
-                const { files } = row.original;
+                const file_uploads = row.original.file_uploads ?? [];
+                console.log("files", file_uploads)
                 return (
                     <div className="flex flex-col gap-1">
-                        {files && files.length > 0 ? (
-                            files.map((file, index) => (
+                        {file_uploads && file_uploads.length > 0 ? (
+                            file_uploads.map((file, index) => (
                                 <div key={index} className="inline-flex">
                                     <Badge variant="secondary" className="px-3 py-1 text-sm w-fit">
                                         <Link

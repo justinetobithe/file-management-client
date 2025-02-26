@@ -128,7 +128,7 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
     useEffect(() => {
         if (isOpen) {
             setFiles([]);
-            setCurrentFiles(data?.files ?? []);
+            setCurrentFiles(data?.file_uploads ?? []);
             setRemovedFileIds([]);
             form.reset({
                 folder_name: data?.folder_name || '',

@@ -12,6 +12,7 @@ export interface Folder {
     department_id?: number[];
 
     files?: UploadedFile[];
+    file_uploads?: UploadedFile[];
 
     subfolders?: Folder[];
     downloadUrl?: string;
