@@ -17,7 +17,7 @@ interface AppInputFileProps {
 }
 
 const AppInputFile: React.FC<AppInputFileProps> = ({ onChange, multiple, name, acceptAll = false }) => {
-    
+
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             const files = e.target.files;
@@ -52,19 +52,26 @@ const AppInputFile: React.FC<AppInputFileProps> = ({ onChange, multiple, name, a
 
     return (
         <FormItem>
-            <FormLabel htmlFor={`custom-file-input-${name}`} className="block text-sm font-medium text-gray-700">
+            {/* <FormLabel htmlFor={`custom-file-input-${name}`} className="block text-sm font-medium text-gray-700">
                 Upload File
-            </FormLabel>
+            </FormLabel> */}
+
+            <label htmlFor={`custom-file-input-${name}`} className="w-full inline-block cursor-pointer bg-primary text-white py-2 px-4 rounded-lg shadow hover:bg-primary transition duration-200 text-sm font-medium text-center">
+                Upload File
+            </label>
             <FormControl>
-                <Input
-                    id={`custom-file-input-${name}`}
-                    name={`custom-file-input-${name}`}
-                    type="file"
-                    className="block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200"
-                    accept={acceptAll ? '.doc,.docx,.pdf,.jpg,.jpeg,.png' : '.pdf'}
-                    onChange={handleFileChange}
-                    multiple={multiple}
-                />
+                <div>
+                    <Input
+                        id={`custom-file-input-${name}`}
+                        name={`custom-file-input-${name}`}
+                        type="file"
+                        // className="block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-200"
+                        className="hidden"
+                        accept={acceptAll ? '.doc,.docx,.pdf,.jpg,.jpeg,.png' : '.pdf'}
+                        onChange={handleFileChange}
+                        multiple={multiple}
+                    />
+                </div>
             </FormControl>
             <FormMessage />
         </FormItem>

@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     ColumnDef,
     PaginationState,
@@ -28,6 +28,8 @@ import AppFolderForm from './AppFolderForm';
 import { Badge } from './ui/badge';
 import { Input } from './ui/input';
 import debounce from 'lodash.debounce';
+import User from '@/types/User';
+import { api } from '@/lib/api';
 
 interface AppFoldersTableProps {
     setSelectedFolders: React.Dispatch<React.SetStateAction<number[]>>;
@@ -45,6 +47,20 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
     const [sorting, setSorting] = useState<SortingState>([]);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
+    const [user, setUser] = useState<User | null>(null);
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const { data } = await api.get<{ data: User }>('/api/me');
+                setUser(data.data);
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        };
+
+        fetchUser();
+    }, []);
 
 
     const debouncedSetSearchKeyword = React.useCallback(
@@ -61,7 +77,8 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
         pageSize,
         searchKeyword,
         sorting.map((item) => item.id).join(','),
-        Boolean(sorting.map((item) => item.desc).join(','))
+        Boolean(sorting.map((item) => item.desc).join(',')),
+        user?.department_id
     );
 
     const { mutate } = useDeleteFolder();
@@ -111,6 +128,8 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
         );
     };
 
+    console.log("data", data?.data)
+
     const columns: ColumnDef<Folder>[] = [
         {
             id: "select",
@@ -120,8 +139,8 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
                     onChange={(e) => {
                         const allIds: number[] =
                             data?.data
-                                .map((folder) => folder.id)
-                                .filter((id): id is number => id !== undefined) || [];
+                                .map((folder: { id: number }) => folder.id)
+                                .filter((id: number): id is number => id !== undefined) || [];
                         setSelectedFolders(e.target.checked ? allIds : []);
                     }}
                     checked={selectedFolders.length === (data?.data.length || 0)}

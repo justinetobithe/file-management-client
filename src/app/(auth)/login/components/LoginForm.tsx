@@ -59,7 +59,7 @@ const LoginForm: FC = () => {
 
     if (response?.error) {
       toast({
-        title: 'Uh oh! Something went wrong.',    
+        title: 'Uh oh! Something went wrong.',
         description: response.error,
         variant: 'destructive',
       });
@@ -72,7 +72,7 @@ const LoginForm: FC = () => {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
         <h4 className='text-center text-2xl font-bold'>
-          Login in to your account
+          File Management System
         </h4>
         <FormField
           control={form.control}

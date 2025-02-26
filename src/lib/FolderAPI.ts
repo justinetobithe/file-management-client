@@ -9,7 +9,8 @@ export const getFolders = async (
     pageSize: number = 10,
     filter = '',
     sortColumn = '',
-    sortDesc = false
+    sortDesc = false,
+    department_id = null
 ): Promise<{ data: Folder[]; last_page: number }> => {
     const response = await api.get<{ data: { data: Folder[]; current_page: number; last_page: number; total: number } }>(`/api/folders`, {
         params: {
@@ -18,6 +19,7 @@ export const getFolders = async (
             ...(filter && { filter }),
             ...(sortColumn && { sort_column: sortColumn }),
             sort_desc: sortDesc,
+            ...(department_id !== null && { department_id })
         },
     });
 
@@ -62,20 +64,32 @@ export const downloadZip = async (id: number): Promise<Response> => {
     return response.data;
 };
 
-
 export const useFolders = (
-    page: number = 1,
-    pageSize: number = 10,
-    globalFilter = '',
-    sortColumn = '',
-    sortDesc = false
-) =>
-    useQuery({
-        queryKey: ['folders', page, pageSize, globalFilter, sortColumn, sortDesc],
-        queryFn: async (): Promise<{ data: Folder[]; last_page: number }> => {
-            return await getFolders(page, pageSize, globalFilter, sortColumn, sortDesc);
+    page: number,
+    pageSize: number,
+    searchKeyword?: string,
+    sortBy?: string,
+    sortDesc?: boolean,
+    departmentId?: number
+) => {
+    return useQuery({
+        queryKey: ['folders', page, pageSize, searchKeyword, sortBy, sortDesc, departmentId],
+        queryFn: async () => {
+            const response = await api.get('/api/folders', {
+                params: {
+                    page,
+                    per_page: pageSize,
+                    search: searchKeyword,
+                    sort_by: sortBy,
+                    sort_desc: sortDesc,
+                    department_id: departmentId,
+                },
+            });
+
+            return response.data;
         },
     });
+};
 
 export const useShowFolder = () => {
     return useMutation({

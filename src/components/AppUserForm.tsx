@@ -96,6 +96,7 @@ const AppUserForm: FC<AppUserFormProps> = ({ data, isOpen, onClose, queryClient 
             role: data?.role || '',
             department_id: data?.department_id || undefined,
             designation_id: data?.designation_id || undefined,
+            password: data ? '' : 'password',
         },
     });
 
