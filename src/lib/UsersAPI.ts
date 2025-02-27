@@ -58,7 +58,7 @@ export const createUser = async (inputs: UserInput): Promise<Response> => {
 };
 
 export const updateUser = async (id: string, inputs: UserInput | ProfileFormInputs | FormData): Promise<Response> => {
-  const response = await api.post<Response>(`/api/user/${id}`, inputs, {
+  const response = await api.put<Response>(`/api/user/${id}`, inputs, {
     headers: {
       'Content-Type': inputs instanceof FormData ? 'multipart/form-data' : 'application/json',
     },
@@ -103,6 +103,11 @@ export const useUpdateUser = () => {
       if (response && response.status === "success") {
         toast({
           variant: 'success',
+          description: response.message,
+        });
+      } else {
+        toast({
+          variant: 'destructive',
           description: response.message,
         });
       }

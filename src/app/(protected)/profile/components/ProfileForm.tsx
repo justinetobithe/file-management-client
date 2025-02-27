@@ -77,15 +77,19 @@ const inputSchema = z
       .string()
       .nullish()
       .transform((v) => v ?? ''),
+    confirm_new_password: z
+      .string()
+      .nullish()
+      .transform((v) => v ?? ''),
     image: z
-      .union([z.instanceof(File), z.string(), z.null()])
+      .union([z.instanceof(File), z.string(), z.null(), z.undefined()])
+      .optional()
       .refine((file) => {
-        if (!file) return false;
-        if (typeof file === 'string') return true;
+        if (!file || typeof file === 'string') return true;
         return file instanceof File && convertBtoMb(file.size) <= MAX_FILE_SIZE;
       }, strings.validation.max_image_size)
       .refine((file) => {
-        if (typeof file === 'string') return true;
+        if (!file || typeof file === 'string') return true;
         return file instanceof File && ACCEPTED_IMAGE_TYPES.includes(file?.type);
       }, strings.validation.allowed_image_formats)
       .transform((v) => (typeof v === 'string' ? v : v || '')),
@@ -120,7 +124,24 @@ const inputSchema = z
       message: 'Please fill out the new password field',
       path: ['new_password'],
     }
-  );
+  ).refine((data) => {
+    if (data.new_password && !data.confirm_new_password) {
+      return false;
+    }
+    return true;
+  }, {
+    message: 'Please confirm your new password',
+    path: ['confirm_new_password'],
+  })
+  .refine((data) => {
+    if (data.new_password && data.confirm_new_password && data.new_password !== data.confirm_new_password) {
+      return false;
+    }
+    return true;
+  }, {
+    message: 'Passwords do not match',
+    path: ['confirm_new_password'],
+  });
 
 export type ProfileFormInputs = z.infer<typeof inputSchema>;
 
@@ -141,20 +162,27 @@ const ProfileForm: FC<{ user: User }> = ({ user }) => {
 
 
   const [open, setOpen] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   const [image, setImage] = useState('');
   const imageRef = useRef<HTMLInputElement | null>(null);
 
   const { mutate, isPending } = useUpdateUser();
 
   const onSubmit = (inputs: ProfileFormInputs) => {
-
+    setLoading(true);
     mutate({
       id: user.id,
       userData: inputs,
     });
-  };
 
+    form.reset({
+      current_password: '',
+      new_password: '',
+      confirm_new_password: '',
+    });
+
+    setLoading(false);
+  };
 
   useEffect(() => {
     console.log("User data:", user);
@@ -403,43 +431,72 @@ const ProfileForm: FC<{ user: User }> = ({ user }) => {
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name='current_password'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Current Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          type='password'
-                          {...field}
-                          className='border-primary focus-visible:ring-offset-0'
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name='new_password'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>New Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          type='password'
-                          {...field}
-                          className='border-primary focus-visible:ring-offset-0'
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+
+                <div className='grid gap-x-10 sm:grid-cols-3 mt-5'>
+
+                  <FormField
+                    control={form.control}
+                    name='current_password'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Current Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            type='password'
+                            {...field}
+                            className='border-primary focus-visible:ring-offset-0'
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name='new_password'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>New Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            type='password'
+                            {...field}
+                            className='border-primary focus-visible:ring-offset-0'
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name='confirm_new_password'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>New Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            type='password'
+                            {...field}
+                            className='border-primary focus-visible:ring-offset-0'
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
               <div className='mt-16 text-right'>
-                <Button className='w-full px-20 sm:w-auto'>Save</Button>
+                <Button className='w-full px-20 sm:w-auto'>
+                  {loading ? (
+                    <>
+                      <AppSpinner /> Saving...
+                    </>
+                  ) : (
+                    "Save"
+                  )}
+                </Button>
               </div>
             </CardContent>
           </form>
