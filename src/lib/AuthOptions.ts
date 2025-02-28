@@ -44,13 +44,19 @@ const AuthOptions: AuthOptions = {
         const [response, error] = await login(credentials.email, credentials.password);
 
         if (error) {
-          throw new Error(error);
+          if (error.includes("User not found")) {
+            throw new Error("User not found. Please check your email.");
+          }
+          if (error.includes("Incorrect password")) {
+            throw new Error("Incorrect password. Please try again.");
+          }
+          throw new Error("Uh oh! Something went wrong.");
         }
+
 
         if (response?.data) {
           const user = response.data.user;
 
-          // Ensure first_name and last_name are strings
           return {
             ...user,
             first_name: user.first_name ?? "",

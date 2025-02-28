@@ -57,8 +57,8 @@ export default function AppUsersTable() {
     setIsEditUserDialogOpen(true);
   };
 
-  const handleDeleteUser = (id: string) => {
-    deleteUser(id.toString(), {
+  const handleDeleteUser = (id: string, password: string) => {
+    deleteUser({ id, password }, {
       onSettled: () => {
         queryClient.invalidateQueries({
           queryKey: ['users']
@@ -224,8 +224,8 @@ export default function AppUsersTable() {
                 </TooltipProvider>
               </DialogTrigger>
               <AppConfirmationDialog
-                title='Delete User'
-                description={`Are you sure you want to delete the user "${item.first_name} ${item.last_name}"? This action cannot be undone.`}
+                title="Delete User"
+                description={`Are you sure you want to delete "${item.first_name} ${item.last_name}"? This action cannot be undone.`}
                 buttonElem={
                   <Button
                     className="text-white"
@@ -236,8 +236,10 @@ export default function AppUsersTable() {
                     <Trash size={20} />
                   </Button>
                 }
-                handleDialogAction={() => handleDeleteUser(item.id!)}
+                requirePassword={true}
+                handleDialogAction={(password) => handleDeleteUser(item.id, password ?? "")}
               />
+
             </Dialog>
           </div>
         );

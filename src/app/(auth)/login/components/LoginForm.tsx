@@ -3,7 +3,6 @@ import React, { FC, useState } from 'react';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -19,6 +18,7 @@ import AppSpinner from '@/components/AppSpinner';
 import { toast } from '@/components/ui/use-toast';
 import { useRouter } from 'next/navigation';
 import { strings } from '@/utils/strings';
+import { Eye, EyeOff } from 'lucide-react';
 
 const inputSchema = z.object({
   email: z
@@ -36,6 +36,7 @@ type Inputs = z.infer<typeof inputSchema>;
 
 const LoginForm: FC = () => {
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   const form = useForm<Inputs>({
@@ -49,7 +50,6 @@ const LoginForm: FC = () => {
   const onSubmit = async (inputs: Inputs) => {
     setLoading(true);
 
-    // LOGIN USER
     const response = await signIn('credentials', {
       ...inputs,
       redirect: false,
@@ -102,20 +102,24 @@ const LoginForm: FC = () => {
           }}
           render={({ field }) => (
             <FormItem>
-              <div className='flex items-center'>
-                <FormLabel className='flex-1 font-medium'>Password</FormLabel>
-                {/* <FormDescription className='flex-1 text-right'>
-                  <Link href='/login' className='text-primary'>
-                    Forgot password?
-                  </Link>
-                </FormDescription> */}
+              <div className='flex items-center justify-between'>
+                <FormLabel className='font-medium'>Password</FormLabel>
               </div>
               <FormControl>
-                <Input
-                  type='password'
-                  {...field}
-                  className='border-border focus-visible:ring-offset-0'
-                />
+                <div className='relative'>
+                  <Input
+                    type={showPassword ? 'text' : 'password'}
+                    {...field}
+                    className='border-border focus-visible:ring-offset-0 pr-10'
+                  />
+                  <button
+                    type='button'
+                    className='absolute inset-y-0 right-2 flex items-center'
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -129,7 +133,6 @@ const LoginForm: FC = () => {
         >
           {loading ? <AppSpinner className='mx-auto' /> : 'Login'}
         </Button>
-
       </form>
     </Form>
   );

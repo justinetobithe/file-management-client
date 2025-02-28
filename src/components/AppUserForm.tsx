@@ -236,6 +236,16 @@ const AppUserForm: FC<AppUserFormProps> = ({ data, isOpen, onClose, queryClient 
                                                     }))}
                                                     onChange={option => field.onChange(option?.value)}
                                                     isClearable
+                                                    // menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
+                                                    menuPlacement="auto"
+                                                    styles={{
+                                                        menuPortal: (base) => ({
+                                                            ...base,
+                                                            zIndex: 9999,
+                                                        }),
+                                                        input: (base) => ({ ...base, 'input:focus': { boxShadow: 'none' } }),
+                                                    }}
+
                                                 />
                                             )}
                                         />
@@ -265,6 +275,16 @@ const AppUserForm: FC<AppUserFormProps> = ({ data, isOpen, onClose, queryClient 
                                                     }))}
                                                     onChange={option => field.onChange(option?.value)}
                                                     isClearable
+                                                    // menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
+                                                    menuPlacement="auto"
+                                                    styles={{
+                                                        menuPortal: (base) => ({
+                                                            ...base,
+                                                            zIndex: 9999,
+                                                        }),
+                                                        input: (base) => ({ ...base, 'input:focus': { boxShadow: 'none' } }),
+                                                    }}
+
                                                 />
                                             )}
                                         />

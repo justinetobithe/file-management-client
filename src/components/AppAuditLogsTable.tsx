@@ -135,36 +135,36 @@ export default function AppAuditLogsTable() {
                 return <div>{item.record_id}</div>;
             },
         },
-        {
-            accessorKey: 'old_value',
-            header: () => (
-                <Button
-                    variant='ghost'
-                    className='pl-0 text-left hover:!bg-transparent font-bold'
-                >
-                    Old Value
-                </Button>
-            ),
-            cell: ({ row }) => {
-                const item = row.original;
-                return <div>{item.old_value}</div>;
-            },
-        },
-        {
-            accessorKey: 'new_value',
-            header: () => (
-                <Button
-                    variant='ghost'
-                    className='pl-0 text-left hover:!bg-transparent font-bold'
-                >
-                    New Value
-                </Button>
-            ),
-            cell: ({ row }) => {
-                const item = row.original;
-                return <div>{item.new_value}</div>;
-            },
-        },
+        // {
+        //     accessorKey: 'old_value',
+        //     header: () => (
+        //         <Button
+        //             variant='ghost'
+        //             className='pl-0 text-left hover:!bg-transparent font-bold'
+        //         >
+        //             Old Value
+        //         </Button>
+        //     ),
+        //     cell: ({ row }) => {
+        //         const item = row.original;
+        //         return <div>{item.old_value}</div>;
+        //     },
+        // },
+        // {
+        //     accessorKey: 'new_value',
+        //     header: () => (
+        //         <Button
+        //             variant='ghost'
+        //             className='pl-0 text-left hover:!bg-transparent font-bold'
+        //         >
+        //             New Value
+        //         </Button>
+        //     ),
+        //     cell: ({ row }) => {
+        //         const item = row.original;
+        //         return <div>{item.new_value}</div>;
+        //     },
+        // },
         {
             accessorKey: 'message',
             header: () => (

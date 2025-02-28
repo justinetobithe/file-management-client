@@ -66,9 +66,10 @@ export const updateUser = async (id: string, inputs: UserInput | ProfileFormInpu
   return response.data;
 };
 
-
-export const deleteUser = async (id: string): Promise<Response> => {
-  const response = await api.delete(`/api/user/${id}`);
+export const deleteUser = async (id: string, password?: string): Promise<Response> => {
+  const response = await api.delete(`/api/user/${id}`, {
+    data: password ? { password } : {},
+  });
   return response.data;
 };
 
@@ -118,8 +119,8 @@ export const useUpdateUser = () => {
 
 export const useDeleteUser = () => {
   return useMutation({
-    mutationFn: async (id: string) => {
-      return await deleteUser(id);
+    mutationFn: async ({ id, password }: { id: string; password?: string }) => {
+      return await deleteUser(id, password);
     },
     onSuccess: (response) => {
       if (response && response.status === "success") {
@@ -131,7 +132,7 @@ export const useDeleteUser = () => {
     },
   });
 };
-
+ 
 export const useUpdateUserStatus = () => {
   return useMutation({
     mutationFn: async ({ id, status }: { id: string; status: number }) => {
