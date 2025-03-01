@@ -21,10 +21,8 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import AuditLog from '@/types/AuditLog';
 import { useAuditLogs } from '@/lib/AuditLogsAPI';
 import AppUserForm from './AppUserForm';
-import { useQueryClient } from '@tanstack/react-query';
 
 export default function AppAuditLogsTable() {
-    const queryClient = useQueryClient();
     const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
         pageIndex: 0,
         pageSize: 10,

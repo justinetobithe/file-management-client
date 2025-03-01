@@ -52,8 +52,7 @@ const AuthOptions: AuthOptions = {
           }
           throw new Error("Uh oh! Something went wrong.");
         }
-
-
+ 
         if (response?.data) {
           const user = response.data.user;
 
