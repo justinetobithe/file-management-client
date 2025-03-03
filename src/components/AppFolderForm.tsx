@@ -315,7 +315,9 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
                                             {user?.department_id ? (
                                                 <Input
                                                     type="text"
-                                                    value={departments.find(dept => dept.id === user?.department_id)?.name || ''}
+                                                    value={
+                                                        departments.find(dept => dept.id === Number(user?.department_id))?.name || ''
+                                                    }
                                                     placeholder="No department assigned"
                                                     readOnly
                                                 /> 
