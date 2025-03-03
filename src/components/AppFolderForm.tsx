@@ -312,7 +312,7 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
                                     <FormItem>
                                         <FormLabel>Department</FormLabel>
                                         <FormControl>
-                                            {user?.department_id !== null ? (
+                                            {user?.department_id ? (
                                                 <Input
                                                     type="text"
                                                     value={
