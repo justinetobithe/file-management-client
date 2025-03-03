@@ -121,7 +121,7 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
 
     useEffect(() => {
         if (user && user.department_id) {
-            form.setValue("department_id", [user.department_id]);
+            form.setValue("department_id", [Number(user?.department_id)]);
         }
     }, [user, form]);
 
@@ -320,7 +320,7 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
                                                     }
                                                     placeholder="No department assigned"
                                                     readOnly
-                                                /> 
+                                                />
                                             ) : (
                                                 <Select
                                                     isMulti
