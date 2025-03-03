@@ -284,21 +284,21 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
             },
             enableSorting: true,
         },
-        {
-            accessorKey: 'local_path',
-            header: ({ column }) => (
-                <Button
-                    variant='ghost'
-                    className='pl-0 text-left hover:!bg-transparent'
-                    onClick={() => column.toggleSorting()}
-                >
-                    Folder Location (Local)
-                    <ArrowUpDown className='ml-2 h-4 w-4' />
-                </Button>
-            ),
-            cell: ({ row }) => row.original.local_path,
-            enableSorting: true,
-        },
+        // {
+        //     accessorKey: 'local_path',
+        //     header: ({ column }) => (
+        //         <Button
+        //             variant='ghost'
+        //             className='pl-0 text-left hover:!bg-transparent'
+        //             onClick={() => column.toggleSorting()}
+        //         >
+        //             Folder Location (Local)
+        //             <ArrowUpDown className='ml-2 h-4 w-4' />
+        //         </Button>
+        //     ),
+        //     cell: ({ row }) => row.original.local_path,
+        //     enableSorting: true,
+        // },
         {
             accessorKey: 'coverage_period',
             header: ({ column }) => (

@@ -33,7 +33,7 @@ import User from '@/types/User';
 const folderSchema = z.object({
     id: z.number().optional(),
     folder_name: z.string().min(1, { message: 'Folder name is required' }),
-    local_path: z.string().min(1, { message: 'Path is required' }),
+    // local_path: z.string().min(1, { message: 'Path is required' }),
     start_date: z.union([z.date(), z.null()]).optional(),
     end_date: z.union([z.date(), z.null()]).optional(),
     department_id: z.array(z.number()).optional(),
@@ -111,7 +111,7 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
         defaultValues: {
             id: data?.id,
             folder_name: data?.folder_name || '',
-            local_path: data?.local_path || '',
+            // local_path: data?.local_path || '',
             start_date: data?.start_date ? new Date(data.start_date) : null,
             end_date: data?.end_date ? new Date(data.end_date) : null,
             department_id: data?.departments?.map(dept => dept.id) ?? [],
@@ -132,7 +132,7 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
             setRemovedFileIds([]);
             form.reset({
                 folder_name: data?.folder_name || '',
-                local_path: data?.local_path || '',
+                // local_path: data?.local_path || '',
                 start_date: data?.start_date ? new Date(data.start_date) : null,
                 end_date: data?.end_date ? new Date(data.end_date) : null,
                 department_id: data?.departments?.map(dept => dept.id) ?? [],
@@ -253,7 +253,7 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
                                 )}
                             />
 
-                            <FormField
+                            {/* <FormField
                                 control={form.control}
                                 name='local_path'
                                 render={({ field }) => (
@@ -265,7 +265,7 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
                                         <FormMessage />
                                     </FormItem>
                                 )}
-                            />
+                            /> */}
 
                             <Controller
                                 control={form.control}
@@ -316,7 +316,7 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
                                                 <Input
                                                     type="text"
                                                     value={
-                                                        departments.find(dept => dept.id === user.department_id)?.name || "Unknown"
+                                                        departments.find(dept => dept.id === user?.department_id)?.name
                                                     }
                                                     readOnly
                                                 />

@@ -4,7 +4,7 @@ import { UploadedFile } from "./UploadedFIle";
 export interface Folder {
     id?: number;
     folder_name?: string;
-    local_path?: string;
+    // local_path?: string;
     start_date?: string | null;
     end_date?: string | null;
 
