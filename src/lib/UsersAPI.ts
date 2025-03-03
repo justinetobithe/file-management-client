@@ -78,6 +78,12 @@ export const updateUserStatus = async (id: string, status: number): Promise<Resp
   return response.data;
 };
 
+export const resetPassword = async (id: string, new_password: string): Promise<Response> => {
+  const response = await api.post<Response>(`/api/user/${id}/reset-password`, { new_password });
+  return response.data;
+};
+
+
 export const useCreateUser = () => {
   return useMutation({
     mutationFn: async (inputs: UserInput) => {
@@ -132,7 +138,7 @@ export const useDeleteUser = () => {
     },
   });
 };
- 
+
 export const useUpdateUserStatus = () => {
   return useMutation({
     mutationFn: async ({ id, status }: { id: string; status: number }) => {
@@ -150,6 +156,28 @@ export const useUpdateUserStatus = () => {
       toast({
         variant: 'destructive',
         description: error?.message || 'Something went wrong!',
+      });
+    },
+  });
+};
+
+export const useResetPassword = () => {
+  return useMutation({
+    mutationFn: async ({ id, new_password }: { id: string; new_password: string }) => {
+      return await resetPassword(id, new_password);
+    },
+    onSuccess: (response) => {
+      if (response && response.status === "success") {
+        toast({
+          variant: 'success',
+          description: response.message || 'Password reset successfully!',
+        });
+      }
+    },
+    onError: (error) => {
+      toast({
+        variant: 'destructive',
+        description: error?.message || 'Failed to reset password!',
       });
     },
   });

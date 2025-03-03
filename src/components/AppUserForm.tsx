@@ -33,14 +33,9 @@ const userSchema = z.object({
     address: z.string().optional(),
     role: z.string().min(3, { message: 'Role is required' }),
     password: z.string().optional(),
-    new_password: z.string().optional(),
-    confirm_password: z.string().optional(),
     department_id: z.number({ required_error: "Department is required" }),
     designation_id: z.number().optional().nullable(),
-}).refine(data => data.new_password === data.confirm_password, {
-    message: "Passwords don't match",
-    path: ["confirm_password"],
-});
+})
 
 export type UserInput = z.infer<typeof userSchema>;
 
@@ -96,7 +91,7 @@ const AppUserForm: FC<AppUserFormProps> = ({ data, isOpen, onClose, queryClient 
             role: data?.role || '',
             department_id: data?.department_id || undefined,
             designation_id: data?.designation_id || undefined,
-            password: data ? '' : 'password',
+            password: '',
         },
     });
 
@@ -120,6 +115,17 @@ const AppUserForm: FC<AppUserFormProps> = ({ data, isOpen, onClose, queryClient 
 
     const onSubmit = async (formData: UserInput) => {
         setLoading(true);
+
+        if (!data?.id && !formData.password) {
+            form.setError("password", { type: "required", message: "Password is required" });
+            setLoading(false);
+            return;
+        } else if (!data?.id && (!formData.password || formData.password.length < 8)) {
+            form.setError("password", { type: "required", message: "Password must be at least 8 characters long" });
+            setLoading(false);
+            return;
+        }
+
         if (data && data.id) {
             await updateUser({ id: data.id, userData: formData }, {
                 onSettled: () => {
@@ -214,7 +220,6 @@ const AppUserForm: FC<AppUserFormProps> = ({ data, isOpen, onClose, queryClient 
                                 )}
                             />
 
-
                             <FormField
                                 control={form.control}
                                 name="department_id"
@@ -236,12 +241,20 @@ const AppUserForm: FC<AppUserFormProps> = ({ data, isOpen, onClose, queryClient 
                                                     }))}
                                                     onChange={option => field.onChange(option?.value)}
                                                     isClearable
-                                                    // menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
+                                                    menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
                                                     menuPlacement="auto"
                                                     styles={{
                                                         menuPortal: (base) => ({
                                                             ...base,
                                                             zIndex: 9999,
+                                                            pointerEvents: "auto",
+                                                            // overflowY: "auto",
+                                                        }),
+                                                        menu: (base) => ({
+                                                            ...base,
+                                                            zIndex: 9999,
+                                                            pointerEvents: "auto",
+                                                            // overflowY: "auto",
                                                         }),
                                                         input: (base) => ({ ...base, 'input:focus': { boxShadow: 'none' } }),
                                                     }}
@@ -275,7 +288,7 @@ const AppUserForm: FC<AppUserFormProps> = ({ data, isOpen, onClose, queryClient 
                                                     }))}
                                                     onChange={option => field.onChange(option?.value)}
                                                     isClearable
-                                                    // menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
+                                                    menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
                                                     menuPlacement="auto"
                                                     styles={{
                                                         menuPortal: (base) => ({
@@ -316,6 +329,23 @@ const AppUserForm: FC<AppUserFormProps> = ({ data, isOpen, onClose, queryClient 
                                     </FormItem>
                                 )}
                             />
+
+                            {!data?.id && (
+                                <FormField
+                                    control={form.control}
+                                    name='password'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Password</FormLabel>
+                                            <FormControl>
+                                                <Input type='password' {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            )}
+
                             <div className='mt-5 flex space-x-2'>
                                 <Button variant="outline" onClick={onClose}>Close</Button>
                                 <Button type="submit" variant="default" className="text-white" disabled={isCreating || isUpdating}>

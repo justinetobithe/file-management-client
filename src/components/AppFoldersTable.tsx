@@ -128,7 +128,6 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
         );
     };
 
-    console.log("data", data?.data)
 
     const columns: ColumnDef<Folder>[] = [
         {
@@ -324,61 +323,66 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
         {
             id: 'actions',
             header: () => <div className='text-center'>Actions</div>,
-            cell: ({ row }) => (
-                <div className="flex justify-center items-center">
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    type='button'
-                                    variant="outline"
-                                    className="mr-2"
-                                    onClick={() => handleEditFolder(row.original)}
-                                >
-                                    <Pencil className="h-4 w-4" />
+            cell: ({ row }) => {
+                const upload_files = row.original.file_uploads ?? [];
+
+                return (
+                    <div className="flex justify-center items-center">
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        type='button'
+                                        variant="outline"
+                                        className="mr-2"
+                                        onClick={() => handleEditFolder(row.original)}
+                                    >
+                                        <Pencil className="h-4 w-4" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>Edit</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+
+                        <AppConfirmationDialog
+                            title='Delete Folder'
+                            description={`Are you sure you want to delete the folder "${row.original.folder_name}"? This action cannot be undone.`}
+                            buttonElem={
+                                <Button className="text-white" variant="destructive" type='button'>
+                                    <Trash size={20} />
                                 </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>Edit</p>
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
+                            }
+                            handleDialogAction={() => handleDeleteFolder(row.original.id!)}
+                        />
 
-                    <AppConfirmationDialog
-                        title='Delete Folder'
-                        description={`Are you sure you want to delete the folder "${row.original.folder_name}"? This action cannot be undone.`}
-                        buttonElem={
-                            <Button className="text-white" variant="destructive" type='button'>
-                                <Trash size={20} />
-                            </Button>
-                        }
-                        handleDialogAction={() => handleDeleteFolder(row.original.id!)}
-                    />
-
-
-
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    type='button'
-                                    variant="secondary"
-                                    className="ml-2"
-                                    onClick={() => handleDownloadZip(row.original)}
-                                >
-                                    <Download className="h-4 w-4" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>Download as ZIP</p>
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
-                </div>
-            ),
+                        {upload_files.length > 0 && (
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            type='button'
+                                            variant="secondary"
+                                            className="ml-2"
+                                            onClick={() => handleDownloadZip(row.original)}
+                                        >
+                                            <Download className="h-4 w-4" />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>Download as ZIP</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        )}
+                    </div>
+                );
+            },
             enableSorting: false,
             enableHiding: false,
         }
+
     ];
 
     const pagination = React.useMemo(() => ({ pageIndex, pageSize }), [pageIndex, pageSize]);

@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/tooltip"
 import { Skeleton } from '@/components/ui/skeleton';
 import AppTable from '@/components/AppTable';
-import { ArrowUpDown, Pencil, XCircle, Trash, UserCheck } from 'lucide-react';
+import { ArrowUpDown, Pencil, Lock, Trash, UserCheck } from 'lucide-react';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import User from '@/types/User';
 import { useDeleteUser, useUpdateUser, useUsers, useUpdateUserStatus } from '@/lib/UsersAPI';
@@ -25,6 +25,7 @@ import { toast } from '@/components/ui/use-toast';
 import AppUserForm from './AppUserForm';
 import { useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
+import AppResetPasswordForm from './AppResetPasswordForm';
 
 export default function AppUsersTable() {
   const queryClient = useQueryClient();
@@ -35,6 +36,7 @@ export default function AppUsersTable() {
   const [searchKeyword, setSearchKeyword] = React.useState('');
   const [sorting, setSorting] = useState<SortingState>([]);
   const [isEditUserDialogOpen, setIsEditUserDialogOpen] = useState(false);
+  const [isResetPasswordDialogOpen, setIsResetPasswordDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] = useState(false);
   const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
@@ -55,6 +57,11 @@ export default function AppUsersTable() {
   const handleEditUser = (user: User) => {
     setSelectedUser(user);
     setIsEditUserDialogOpen(true);
+  };
+
+  const handleResetPassword = (user: User) => {
+    setSelectedUser(user);
+    setIsResetPasswordDialogOpen(true);
   };
 
   const handleDeleteUser = (id: string, password: string) => {
@@ -230,8 +237,7 @@ export default function AppUsersTable() {
                   <Button
                     className="text-white"
                     variant="destructive"
-                    type='button'
-                    style={{ marginLeft: '8px' }}
+                    type='button' 
                   >
                     <Trash size={20} />
                   </Button>
@@ -240,6 +246,25 @@ export default function AppUsersTable() {
                 handleDialogAction={(password) => handleDeleteUser(item.id, password ?? "")}
               />
 
+              <DialogTrigger asChild>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type='button'
+                        variant="secondary"
+                        className="ml-2 mr-2"
+                        onClick={() => handleResetPassword(item)}
+                      >
+                        <Lock className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Reset Password</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </DialogTrigger>
             </Dialog>
           </div>
         );
@@ -291,6 +316,15 @@ export default function AppUsersTable() {
           data={selectedUser}
           isOpen={isEditUserDialogOpen}
           onClose={() => setIsEditUserDialogOpen(false)}
+          queryClient={queryClient}
+        />
+      )}
+
+      {selectedUser && (
+        <AppResetPasswordForm
+          user={selectedUser}
+          isOpen={isResetPasswordDialogOpen}
+          onClose={() => setIsResetPasswordDialogOpen(false)}
           queryClient={queryClient}
         />
       )}

@@ -33,7 +33,7 @@ import User from '@/types/User';
 const folderSchema = z.object({
     id: z.number().optional(),
     folder_name: z.string().min(1, { message: 'Folder name is required' }),
-    local_path: z.string().optional(),
+    local_path: z.string().min(1, { message: 'Path is required' }),
     start_date: z.union([z.date(), z.null()]).optional(),
     end_date: z.union([z.date(), z.null()]).optional(),
     department_id: z.array(z.number()).optional(),
@@ -310,29 +310,40 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
                                 name="department_id"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Departments</FormLabel>
-                                        <Controller
-                                            control={form.control}
-                                            name="department_id"
-                                            render={({ field }) => (
+                                        <FormLabel>Department</FormLabel>
+                                        <FormControl>
+                                            {user?.department_id ? (
+                                                <Input
+                                                    type="text"
+                                                    value={
+                                                        departments.find(dept => dept.id === user.department_id)?.name || "Unknown"
+                                                    }
+                                                    readOnly
+                                                />
+                                            ) : (
                                                 <Select
                                                     isMulti
-                                                    value={departments
-                                                        .filter(dept => field.value?.includes(dept.id!))
-                                                        .map(dept => ({ value: dept.id, label: dept.name }))}
-                                                    onChange={(selected) => field.onChange(selected.map(option => option.value))}
                                                     options={departments.map(dept => ({
                                                         value: dept.id,
-                                                        label: dept.name,
+                                                        label: dept.name
                                                     }))}
-                                                    isClearable
+                                                    onChange={selected =>
+                                                        field.onChange(selected.map(option => option.value))
+                                                    }
+                                                    value={departments
+                                                        .filter(dept => field.value?.includes(dept.id!))
+                                                        .map(dept => ({
+                                                            value: dept.id,
+                                                            label: dept.name
+                                                        }))}
                                                 />
                                             )}
-                                        />
+                                        </FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )}
                             />
+
 
                             <FormField
                                 control={form.control}
