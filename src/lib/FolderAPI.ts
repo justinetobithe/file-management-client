@@ -10,7 +10,8 @@ export const getFolders = async (
     filter = '',
     sortColumn = '',
     sortDesc = false,
-    department_id = null
+    department_id = null,
+    all_folders = true,
 ): Promise<{ data: Folder[]; last_page: number }> => {
     const response = await api.get<{ data: { data: Folder[]; current_page: number; last_page: number; total: number } }>(`/api/folders`, {
         params: {
@@ -19,7 +20,8 @@ export const getFolders = async (
             ...(filter && { filter }),
             ...(sortColumn && { sort_column: sortColumn }),
             sort_desc: sortDesc,
-            ...(department_id !== null && { department_id })
+            ...(department_id !== null && { department_id }),
+            all_folders: all_folders ?? false
         },
     });
 
@@ -70,10 +72,11 @@ export const useFolders = (
     searchKeyword?: string,
     sortBy?: string,
     sortDesc?: boolean,
-    departmentId?: number
+    departmentId?: number,
+    allFolders?: boolean
 ) => {
     return useQuery({
-        queryKey: ['folders', page, pageSize, searchKeyword, sortBy, sortDesc, departmentId],
+        queryKey: ['folders', page, pageSize, searchKeyword, sortBy, sortDesc, departmentId, allFolders],
         queryFn: async () => {
             const response = await api.get('/api/folders', {
                 params: {
@@ -83,6 +86,7 @@ export const useFolders = (
                     sort_by: sortBy,
                     sort_desc: sortDesc,
                     department_id: departmentId,
+                    all_folders: allFolders
                 },
             });
 

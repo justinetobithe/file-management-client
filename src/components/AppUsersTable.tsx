@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/tooltip"
 import { Skeleton } from '@/components/ui/skeleton';
 import AppTable from '@/components/AppTable';
-import { ArrowUpDown, Pencil, Lock, Trash, UserCheck } from 'lucide-react';
+import { ArrowUpDown, Pencil, Lock, Trash, UserCheck, UserCog } from 'lucide-react';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import User from '@/types/User';
 import { useDeleteUser, useUpdateUser, useUsers, useUpdateUserStatus } from '@/lib/UsersAPI';
@@ -26,6 +26,7 @@ import AppUserForm from './AppUserForm';
 import { useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 import AppResetPasswordForm from './AppResetPasswordForm';
+import AppPositionForm from './AppPositionForm';
 
 export default function AppUsersTable() {
   const queryClient = useQueryClient();
@@ -36,11 +37,9 @@ export default function AppUsersTable() {
   const [searchKeyword, setSearchKeyword] = React.useState('');
   const [sorting, setSorting] = useState<SortingState>([]);
   const [isEditUserDialogOpen, setIsEditUserDialogOpen] = useState(false);
+  const [isEditPositionDialogOpen, setIsEditPositionDialogOpen] = useState(false);
   const [isResetPasswordDialogOpen, setIsResetPasswordDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] = useState(false);
-  const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const { data, isLoading } = useUsers(
     pageIndex + 1,
@@ -57,6 +56,11 @@ export default function AppUsersTable() {
   const handleEditUser = (user: User) => {
     setSelectedUser(user);
     setIsEditUserDialogOpen(true);
+  };
+
+  const handleEditPosition = (user: User) => {
+    setSelectedUser(user);
+    setIsEditPositionDialogOpen(true);
   };
 
   const handleResetPassword = (user: User) => {
@@ -168,7 +172,22 @@ export default function AppUsersTable() {
       ),
       cell: ({ row }) => {
         const item = row.original;
-        return <div>{item.department?.name}</div>;
+        return <div>{item.position?.department?.name}</div>;
+      },
+    },
+    {
+      accessorKey: 'department',
+      header: () => (
+        <Button
+          variant='ghost'
+          className='pl-0 text-left hover:!bg-transparent'
+        >
+          Designation
+        </Button>
+      ),
+      cell: ({ row }) => {
+        const item = row.original;
+        return <div>{item.position?.designation?.designation}</div>;
       },
     },
     {
@@ -194,6 +213,24 @@ export default function AppUsersTable() {
         return (
           <div className="flex justify-center items-center">
             <Dialog>
+              <DialogTrigger asChild>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type='button'
+                        variant="secondary"
+                        onClick={() => handleEditPosition(item)}
+                      >
+                        <UserCog className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Position</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </DialogTrigger>
               {item.status == 0 && (
                 <AppConfirmationDialog
                   title='Approve User'
@@ -203,7 +240,6 @@ export default function AppUsersTable() {
                       className="text-white"
                       variant="success"
                       type='button'
-                      style={{ marginLeft: '8px' }}
                     >
                       <UserCheck size={20} />
                     </Button>
@@ -217,7 +253,7 @@ export default function AppUsersTable() {
                     <TooltipTrigger asChild>
                       <Button
                         type='button'
-                        variant="outline"
+                        variant="default"
                         className="ml-2 mr-2"
                         onClick={() => handleEditUser(item)}
                       >
@@ -237,7 +273,7 @@ export default function AppUsersTable() {
                   <Button
                     className="text-white"
                     variant="destructive"
-                    type='button' 
+                    type='button'
                   >
                     <Trash size={20} />
                   </Button>
@@ -252,7 +288,7 @@ export default function AppUsersTable() {
                     <TooltipTrigger asChild>
                       <Button
                         type='button'
-                        variant="secondary"
+                        variant="ghost"
                         className="ml-2 mr-2"
                         onClick={() => handleResetPassword(item)}
                       >
@@ -325,6 +361,15 @@ export default function AppUsersTable() {
           user={selectedUser}
           isOpen={isResetPasswordDialogOpen}
           onClose={() => setIsResetPasswordDialogOpen(false)}
+          queryClient={queryClient}
+        />
+      )}
+
+      {selectedUser && (
+        <AppPositionForm
+          user={selectedUser}
+          isOpen={isEditPositionDialogOpen}
+          onClose={() => setIsEditPositionDialogOpen(false)}
           queryClient={queryClient}
         />
       )}

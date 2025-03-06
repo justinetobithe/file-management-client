@@ -1,5 +1,6 @@
 import { Department } from "./Department";
 import { Designation } from "./Designation";
+import { Position } from "./Position";
 
 // MAIN
 export default interface User {
@@ -17,13 +18,8 @@ export default interface User {
   email_verified?: Date | null;
   status?: number;
 
-  department_id?: number;
-  designation_id?: number;
-
-  department?: Department;
-  designation?: Designation;
+  position?: Position;
 }
-
 
 export interface UserPaginatedData {
   data: User[];

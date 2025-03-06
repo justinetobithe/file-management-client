@@ -50,19 +50,17 @@ const folderSchema = z.object({
 
 export type FolderInput = z.infer<typeof folderSchema>;
 
-interface AppFolderFormProps {
-    data?: Folder;
+interface AppSubFolderFormProps {
+    folder?: Folder;
     isOpen: boolean;
     onClose: () => void;
     queryClient: QueryClient;
 }
 
-const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryClient }) => {
+const AppSubFolderForm: FC<AppSubFolderFormProps> = ({ folder, isOpen, onClose, queryClient }) => {
 
     const [loading, setLoading] = useState(false);
     const [files, setFiles] = useState<UploadedFile[]>([]);
-    const [currentFiles, setCurrentFiles] = useState<UploadedFile[]>([]);
-    const [removedFileIds, setRemovedFileIds] = useState<number[]>([]);
 
     const [departments, setDepartments] = useState<Department[]>([]);
     const [folders, setFolders] = useState<Folder[]>([]);
@@ -109,13 +107,12 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
     const form = useForm<FolderInput>({
         resolver: zodResolver(folderSchema),
         defaultValues: {
-            id: data?.id,
-            folder_name: data?.folder_name || '',
+            folder_name: '',
             // local_path: data?.local_path || '',
-            start_date: data?.start_date ? new Date(data.start_date) : null,
-            end_date: data?.end_date ? new Date(data.end_date) : null,
-            department_id: data?.departments?.map(dept => dept.id) ?? [],
-            parent_id: data?.parent_id || undefined,
+            start_date: null,
+            end_date: null,
+            department_id: folder?.departments?.map(dept => dept.id) ?? [],
+            parent_id: folder?.id,
         },
     });
 
@@ -128,18 +125,9 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
     useEffect(() => {
         if (isOpen) {
             setFiles([]);
-            setCurrentFiles(data?.file_uploads ?? []);
-            setRemovedFileIds([]);
-            form.reset({
-                folder_name: data?.folder_name || '',
-                // local_path: data?.local_path || '',
-                start_date: data?.start_date ? new Date(data.start_date) : null,
-                end_date: data?.end_date ? new Date(data.end_date) : null,
-                department_id: data?.departments?.map(dept => dept.id) ?? [],
-                parent_id: data?.parent_id || undefined,
-            });
+            form.reset();
         }
-    }, [isOpen, data, form]);
+    }, [isOpen, form]);
 
     const handleFileChange = (selectedFiles: FileList) => {
         const filesArray = Array.from(selectedFiles).map((file, index) => ({
@@ -151,14 +139,6 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
         setFiles([...files, ...filesArray]);
     };
 
-    const handleRemoveCurrentFile = (id: number) => {
-        setCurrentFiles((prevFiles) => {
-            const updatedFiles = prevFiles.filter(file => file.id !== id);
-            setRemovedFileIds((prevIds) => [...prevIds, id]);
-            return updatedFiles;
-        });
-    };
-
     const handleRemoveFile = (id: number) => {
         setFiles((prevFiles) => {
             const updatedFiles = [...prevFiles];
@@ -168,7 +148,6 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
     };
 
     const { mutate: createFolder, isPending: isCreating } = useCreateFolder();
-    const { mutate: updateFolder, isPending: isUpdating } = useUpdateFolder();
 
     const onSubmit = async (formData: FolderInput) => {
         const formattedData = new FormData();
@@ -201,30 +180,13 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
 
         setLoading(true);
 
-        if (data && data.id) {
-            if (removedFileIds && removedFileIds.length > 0) {
-                formattedData.append('current_files', JSON.stringify(removedFileIds));
-            }
+        await createFolder(formattedData as Folder, {
+            onSettled: () => {
+                onClose();
+                queryClient.invalidateQueries({ queryKey: ['folders'] });
+            },
+        });
 
-            formattedData.append('_method', 'PUT');
-
-            await updateFolder(
-                { id: data.id, folderData: formattedData as Folder },
-                {
-                    onSettled: () => {
-                        onClose();
-                        queryClient.invalidateQueries({ queryKey: ['folders'] });
-                    },
-                }
-            );
-        } else {
-            await createFolder(formattedData as Folder, {
-                onSettled: () => {
-                    onClose();
-                    queryClient.invalidateQueries({ queryKey: ['folders'] });
-                },
-            });
-        }
 
         setLoading(false);
     };
@@ -234,7 +196,7 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
         <AlertDialog open={isOpen}>
             <AlertDialogContent>
                 <AlertDialogHeader>
-                    <AlertDialogTitle>{data ? 'Edit Folder' : 'Add Folder'}</AlertDialogTitle>
+                    <AlertDialogTitle>Add Subfolder for {folder?.folder_name}</AlertDialogTitle>
                 </AlertDialogHeader>
                 <div style={{ maxHeight: '70vh', overflowY: 'auto' }}>
                     <Form {...form}>
@@ -244,7 +206,7 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
                                 name='folder_name'
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Folder Name</FormLabel>
+                                        <FormLabel>Folder Name (Sub)</FormLabel>
                                         <FormControl>
                                             <Input type='text' {...field} />
                                         </FormControl>
@@ -252,20 +214,6 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
                                     </FormItem>
                                 )}
                             />
-
-                            {/* <FormField
-                                control={form.control}
-                                name='local_path'
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Local Path</FormLabel>
-                                        <FormControl>
-                                            <Input type='text' {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            /> */}
 
                             <Controller
                                 control={form.control}
@@ -345,38 +293,6 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
                                 )}
                             />
 
-
-                            <FormField
-                                control={form.control}
-                                name="parent_id"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Parent Folder</FormLabel>
-                                        <Controller
-                                            control={form.control}
-                                            name="parent_id"
-                                            render={({ field }) => (
-                                                <Select
-                                                    value={folders.find(folder => folder.id === field.value) ? {
-                                                        value: field.value,
-                                                        label: folders.find(folder => folder.id === field.value)?.folder_name,
-                                                    } : null}
-                                                    options={folders
-                                                        .filter(folder => folder.id !== data?.id)
-                                                        .map(folder => ({
-                                                            value: folder.id,
-                                                            label: folder.folder_name,
-                                                        }))}
-                                                    onChange={option => field.onChange(option?.value)}
-                                                    isClearable
-                                                />
-                                            )}
-                                        />
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
                             <AppInputFile
                                 onChange={handleFileChange}
                                 multiple={true}
@@ -399,26 +315,13 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
                                             </button>
                                         </div>
                                     ))}
-                                    {currentFiles.map((file) => (
-                                        <div key={file.id} className='flex items-center justify-between bg-gray-100 p-2 rounded-lg'>
-                                            <span className='text-sm text-gray-700'>{file.filename}</span>
-                                            <button
-                                                type="button"
-                                                className='text-red-500 hover:text-red-700 focus:outline-none'
-                                                onClick={() => handleRemoveCurrentFile(file.id!)}
-                                                aria-label="Remove current file"
-                                            >
-                                                <X size={18} />
-                                            </button>
-                                        </div>
-                                    ))}
                                 </div>
                             </div>
 
                             <div className='mt-5 flex space-x-2'>
                                 <Button variant='outline' onClick={onClose}>Close</Button>
-                                <Button type='submit' variant='default' className='text-white' disabled={isCreating || isUpdating}>
-                                    {loading ? <AppSpinner /> : (data ? 'Save' : 'Add')}
+                                <Button type='submit' variant='default' className='text-white' disabled={isCreating}>
+                                    {loading ? <AppSpinner /> : 'Add'}
                                 </Button>
                             </div>
                         </form>
@@ -429,4 +332,4 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
     );
 };
 
-export default AppFolderForm;
+export default AppSubFolderForm;

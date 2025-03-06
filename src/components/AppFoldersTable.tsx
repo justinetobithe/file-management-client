@@ -8,6 +8,7 @@ import {
     useReactTable,
 } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import {
     Tooltip,
     TooltipContent,
@@ -16,7 +17,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Skeleton } from '@/components/ui/skeleton';
 import AppTable from '@/components/AppTable';
-import { ArrowUpDown, Pencil, Trash, Download, Search } from 'lucide-react';
+import { ArrowUpDown, Pencil, Trash, Download, Search, Folder as FolderIcon } from 'lucide-react';
 import { Folder } from '@/types/Folder';
 import { useDeleteFolder, useFolders, useUpdateFolder, useDownloadZip } from '@/lib/FolderAPI';
 import { useQueryClient } from '@tanstack/react-query';
@@ -30,6 +31,7 @@ import { Input } from './ui/input';
 import debounce from 'lodash.debounce';
 import User from '@/types/User';
 import { api } from '@/lib/api';
+import AppSubFolderForm from './AppSubFolderForm';
 
 interface AppFoldersTableProps {
     setSelectedFolders: React.Dispatch<React.SetStateAction<number[]>>;
@@ -46,8 +48,14 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
     const [searchKeyword, setSearchKeyword] = React.useState('');
     const [sorting, setSorting] = useState<SortingState>([]);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+    const [isAddSubFolderDialogOpen, setIsAddSubFolderDialogOpen] = useState(false);
     const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
     const [user, setUser] = useState<User | null>(null);
+    const [showAllFolders, setShowAllFolders] = useState(true);
+
+    const toggleFolderView = () => {
+        setShowAllFolders((prev) => !prev);
+    };
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -78,7 +86,8 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
         searchKeyword,
         sorting.map((item) => item.id).join(','),
         Boolean(sorting.map((item) => item.desc).join(',')),
-        user?.department_id
+        user?.position?.department_id,
+        showAllFolders
     );
 
     const { mutate } = useDeleteFolder();
@@ -88,6 +97,11 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
     const handleEditFolder = (folder: Folder) => {
         setSelectedFolder(folder);
         setIsEditDialogOpen(true);
+    };
+
+    const handleAddSubFolder = (folder: Folder) => {
+        setSelectedFolder(folder);
+        setIsAddSubFolderDialogOpen(true);
     };
 
     const handleDeleteFolder = (id: number) => {
@@ -328,13 +342,54 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
 
                 return (
                     <div className="flex justify-center items-center">
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button
+                                                type='button'
+                                                variant="default"
+                                                onClick={() => handleAddSubFolder(row.original)}
+                                            >
+                                                <FolderIcon className="h-4 w-4" />
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>Add Subfolder</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            </DialogTrigger>
+                        </Dialog>
+
+                        {upload_files.length > 0 && (
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            type='button'
+                                            variant="secondary"
+                                            className="ml-2"
+                                            onClick={() => handleDownloadZip(row.original)}
+                                        >
+                                            <Download className="h-4 w-4" />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>Download as ZIP</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        )}
+
                         <TooltipProvider>
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button
                                         type='button'
                                         variant="outline"
-                                        className="mr-2"
+                                        className="mr-2 ml-2"
                                         onClick={() => handleEditFolder(row.original)}
                                     >
                                         <Pencil className="h-4 w-4" />
@@ -357,25 +412,6 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
                             handleDialogAction={() => handleDeleteFolder(row.original.id!)}
                         />
 
-                        {upload_files.length > 0 && (
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button
-                                            type='button'
-                                            variant="secondary"
-                                            className="ml-2"
-                                            onClick={() => handleDownloadZip(row.original)}
-                                        >
-                                            <Download className="h-4 w-4" />
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>Download as ZIP</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
-                        )}
                     </div>
                 );
             },
@@ -409,21 +445,39 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
 
     return (
         <div>
-            <div className="relative w-full max-w-xs">
-                <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-                <Input
-                    type="text"
-                    placeholder="Search..."
-                    className="pl-10"
-                    onChange={handleSearchChange}
-                />
+            <div className="flex items-center gap-4 w-full">
+                <div className="relative w-full max-w-xs">
+                    <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                    <Input
+                        type="text"
+                        placeholder="Search..."
+                        className="pl-10"
+                        onChange={handleSearchChange}
+                    />
+                </div>
+
+                <div className="flex gap-2">
+                    <Button onClick={toggleFolderView}>
+                        {showAllFolders ? 'Show Main Folders Only' : 'Show All Folders'}
+                    </Button>
+                </div>
             </div>
+
             <AppTable table={table} />
             {selectedFolder && (
                 <AppFolderForm
                     data={selectedFolder}
                     isOpen={isEditDialogOpen}
                     onClose={() => setIsEditDialogOpen(false)}
+                    queryClient={queryClient}
+                />
+            )}
+
+            {selectedFolder && (
+                <AppSubFolderForm
+                    folder={selectedFolder}
+                    isOpen={isAddSubFolderDialogOpen}
+                    onClose={() => setIsAddSubFolderDialogOpen(false)}
                     queryClient={queryClient}
                 />
             )}

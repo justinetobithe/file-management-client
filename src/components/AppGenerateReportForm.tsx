@@ -23,11 +23,13 @@ import { api } from "@/lib/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "./ui/use-toast";
+import { Department } from "@/types/Department";
 
 const reportSchema = z.object({
     effective_date: z.union([z.date(), z.null()]).optional(),
     folders: z.array(z.number()),
-    checked_by: z.number().optional(),
+    department_id: z.number().optional(),
+    // checked_by: z.number().optional(),
 });
 
 export type ReportInput = z.infer<typeof reportSchema>;
@@ -41,27 +43,27 @@ interface AppGenerateReportFormProps {
 
 const AppGenerateReportForm: React.FC<AppGenerateReportFormProps> = ({ isOpen, onClose, queryClient, selectedFolders }) => {
     const [loading, setLoading] = useState(false);
-    const [users, setUsers] = useState<User[]>([]);
+    const [departments, setDepartments] = useState<Department[]>([]);
 
     const form = useForm<ReportInput>({
         resolver: zodResolver(reportSchema),
         defaultValues: {
             effective_date: undefined,
-            checked_by: undefined,
+            department_id: undefined,
             folders: selectedFolders,
         },
     });
 
     useEffect(() => {
-        const fetchUsers = async () => {
+        const fetchDeparments = async () => {
             try {
-                const response = await api.get<{ data: User[] }>('/api/users');
-                setUsers(response.data.data);
+                const response = await api.get<{ data: Department[] }>('/api/departments');
+                setDepartments(response.data.data);
             } catch (error) {
-                console.error("Error fetching users:", error);
+                console.error("Error fetching departments:", error);
             }
         };
-        fetchUsers();
+        fetchDeparments();
     }, []);
 
     const onSubmit = async (data: ReportInput) => {
@@ -74,21 +76,19 @@ const AppGenerateReportForm: React.FC<AppGenerateReportFormProps> = ({ isOpen, o
             return;
         }
 
-        if (!data.checked_by) {
+        if (!data.department_id) {
             toast({
                 variant: 'destructive',
-                description: "Please select a user to check the report.",
+                description: "Please select a depertment to check the report.",
             });
             return;
         }
 
         const formData = {
-            checked_by: data.checked_by,
+            department_id: data.department_id,
             effective_date: data.effective_date ? format(data.effective_date, "yyyy-MM-dd") : null,
             selected_folders: data.folders,
         };
-
-        console.log("formData", formData);
 
         setLoading(true);
 
@@ -144,18 +144,16 @@ const AppGenerateReportForm: React.FC<AppGenerateReportFormProps> = ({ isOpen, o
 
                             <FormField
                                 control={form.control}
-                                name="checked_by"
+                                name="department_id"
                                 render={({ field }) => {
-
-
                                     return (
                                         <FormItem>
-                                            <FormLabel>Checked By</FormLabel>
+                                            <FormLabel>Checked By (Department)</FormLabel>
                                             <FormControl>
                                                 <Select
-                                                    options={users.map(user => ({
-                                                        value: user.id,
-                                                        label: `${user.first_name} ${user.last_name}`,
+                                                    options={departments.map(department => ({
+                                                        value: department.id,
+                                                        label: department.name,
                                                     }))}
                                                     onChange={option => field.onChange(option?.value)}
                                                     isClearable
@@ -166,7 +164,6 @@ const AppGenerateReportForm: React.FC<AppGenerateReportFormProps> = ({ isOpen, o
                                     );
                                 }}
                             />
-
 
                             <div className='mt-5 flex space-x-2'>
                                 <Button variant='outline' onClick={onClose}>Close</Button>

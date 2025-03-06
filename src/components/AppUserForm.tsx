@@ -33,8 +33,6 @@ const userSchema = z.object({
     address: z.string().optional(),
     role: z.string().min(3, { message: 'Role is required' }),
     password: z.string().optional(),
-    department_id: z.number({ required_error: "Department is required" }),
-    designation_id: z.number().optional().nullable(),
 })
 
 export type UserInput = z.infer<typeof userSchema>;
@@ -53,33 +51,7 @@ const roleOptions = [
 
 const AppUserForm: FC<AppUserFormProps> = ({ data, isOpen, onClose, queryClient }) => {
     const [loading, setLoading] = useState(false);
-    const [departments, setDepartments] = useState<Department[]>([]);
-    const [designations, setDesignations] = useState<Designation[]>([]);
-
-    useEffect(() => {
-        const fetchDepartments = async () => {
-            try {
-                const response = await api.get<{ data: Department[] }>('/api/departments');
-                setDepartments(response.data.data);
-            } catch (error) {
-                console.error("Error fetching departments:", error);
-            }
-        };
-        fetchDepartments();
-    }, []);
-
-    useEffect(() => {
-        const fetchDesignations = async () => {
-            try {
-                const response = await api.get<{ data: Designation[] }>('/api/designations');
-                setDesignations(response.data.data);
-            } catch (error) {
-                console.error("Error fetching departments:", error);
-            }
-        };
-        fetchDesignations();
-    }, []);
-
+    
     const form = useForm<UserInput>({
         resolver: zodResolver(userSchema),
         defaultValues: {
@@ -89,8 +61,7 @@ const AppUserForm: FC<AppUserFormProps> = ({ data, isOpen, onClose, queryClient 
             phone: data?.phone || '',
             address: data?.address || '',
             role: data?.role || '',
-            department_id: data?.department_id || undefined,
-            designation_id: data?.designation_id || undefined,
+
             password: '',
         },
     });
@@ -104,8 +75,7 @@ const AppUserForm: FC<AppUserFormProps> = ({ data, isOpen, onClose, queryClient 
                 phone: data.phone,
                 address: data.address,
                 role: data.role,
-                department_id: data.department_id,
-                designation_id: data.designation_id,
+
             });
         }
     }, [data, form]);
@@ -215,64 +185,6 @@ const AppUserForm: FC<AppUserFormProps> = ({ data, isOpen, onClose, queryClient 
                                         <FormControl>
                                             <Input type='text' {...field} />
                                         </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={form.control}
-                                name="department_id"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Department</FormLabel>
-                                        <Controller
-                                            control={form.control}
-                                            name="department_id"
-                                            render={({ field }) => (
-                                                <Select
-                                                    value={departments.find(department => department.id === field.value) ? {
-                                                        value: field.value,
-                                                        label: departments.find(department => department.id === field.value)?.name,
-                                                    } : null}
-                                                    options={departments.map(department => ({
-                                                        value: department.id!,
-                                                        label: department.name,
-                                                    }))}
-                                                    onChange={option => field.onChange(option?.value)}
-                                                    isClearable
-                                                />
-                                            )}
-                                        />
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={form.control}
-                                name="designation_id"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Designation</FormLabel>
-                                        <Controller
-                                            control={form.control}
-                                            name="designation_id"
-                                            render={({ field }) => (
-                                                <Select
-                                                    value={designations.find(designation => designation.id === field.value) ? {
-                                                        value: field.value,
-                                                        label: designations.find(designation => designation.id === field.value)?.designation,
-                                                    } : null}
-                                                    options={designations.map(designation => ({
-                                                        value: designation.id!,
-                                                        label: designation.designation,
-                                                    }))}
-                                                    onChange={option => field.onChange(option?.value)}
-                                                    isClearable
-                                                />
-                                            )}
-                                        />
                                         <FormMessage />
                                     </FormItem>
                                 )}
