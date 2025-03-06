@@ -396,7 +396,7 @@ const ProfileForm: FC<{ user: User }> = ({ user }) => {
                     <FormControl>
                       <Input
                         type="text"
-                        value={user.department?.name}
+                        value={user.position?.department?.name}
                         disabled
                         className="border-primary focus-visible:ring-offset-0"
                       />
@@ -407,7 +407,7 @@ const ProfileForm: FC<{ user: User }> = ({ user }) => {
                     <FormControl>
                       <Input
                         type="text"
-                        value={user.designation?.designation}
+                        value={user.position?.designation?.designation}
                         disabled
                         className="border-primary focus-visible:ring-offset-0"
                       />
