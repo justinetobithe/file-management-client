@@ -42,6 +42,7 @@ interface AppGenerateReportFormProps {
 
 const AppGenerateReportForm: React.FC<AppGenerateReportFormProps> = ({ isOpen, onClose, queryClient, selectedFolders }) => {
     const [loading, setLoading] = useState(false);
+    const [user, setUser] = useState<User | null>(null);
 
     const form = useForm<ReportInput>({
         resolver: zodResolver(reportSchema),
@@ -51,7 +52,28 @@ const AppGenerateReportForm: React.FC<AppGenerateReportFormProps> = ({ isOpen, o
         },
     });
 
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const { data } = await api.get<{ data: User }>('/api/me');
+                setUser(data.data);
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        };
+
+        fetchUser();
+    }, []);
+
+
     const onSubmit = async (data: ReportInput) => {
+        if (!user?.position || !user.position.department_id) {
+            toast({
+                variant: 'destructive',
+                description: "You must have a position and department before generating a report.",
+            });
+            return;
+        }
 
         if (!data.effective_date) {
             toast({
