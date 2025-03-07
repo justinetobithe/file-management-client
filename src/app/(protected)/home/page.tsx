@@ -23,15 +23,16 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <div className="relative w-full h-[400px] md:h-[500px]">
+      <div className="relative w-full h-[300px] sm:h-[400px] md:h-[500px] lg:h-[600px] xl:h-[700px]">
         <Image
           src="/img/CF-GR.png"
           alt="Design Background"
           layout="fill"
           objectFit="cover"
-          objectPosition="bottom"
+          objectPosition="center"
           className="w-full"
         />
+
 
         <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40">
           <h1 className="text-4xl md:text-5xl font-bold text-white shadow-lg">
