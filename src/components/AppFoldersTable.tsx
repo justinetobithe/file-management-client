@@ -120,6 +120,7 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
                     return;
                 }
 
+
                 const url = response.data;
                 const link = document.createElement('a');
                 link.href = url;
@@ -127,6 +128,7 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
+                URL.revokeObjectURL(url);
             },
             onError: (error) => {
                 console.error('Error downloading zip:', error);
@@ -332,6 +334,7 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
             header: () => <div className='text-center'>Actions</div>,
             cell: ({ row }) => {
                 const upload_files = row.original.file_uploads ?? [];
+                const subfolders = row.original.subfolders ?? [];
 
                 return (
                     <div className="flex justify-center items-center">
@@ -413,12 +416,6 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
         }
 
     ];
-
-    // if (user?.role == 'admin') {
-    //     columns.push({
-
-    //     });
-    // }
 
     const pagination = React.useMemo(() => ({ pageIndex, pageSize }), [pageIndex, pageSize]);
 
