@@ -120,14 +120,21 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
                     return;
                 }
 
-
                 const url = response.data;
+                const newTab = window.open(url, '_blank');
+
+                if (!newTab) {
+                    console.error('Failed to open new tab. Make sure pop-ups are not blocked.');
+                    return;
+                }
+
                 const link = document.createElement('a');
                 link.href = url;
                 link.setAttribute('download', `${folder.folder_name}.zip`);
-                document.body.appendChild(link);
+                newTab.document.body.appendChild(link);
                 link.click();
-                document.body.removeChild(link);
+                newTab.document.body.removeChild(link);
+
                 URL.revokeObjectURL(url);
             },
             onError: (error) => {
@@ -135,6 +142,7 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
             },
         });
     };
+
 
     const handleCheckboxChange = (id: number) => {
         setSelectedFolders((prevSelected: number[]) =>
