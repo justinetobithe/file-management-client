@@ -288,7 +288,7 @@ export default function AppUsersTable() {
                     <TooltipTrigger asChild>
                       <Button
                         type='button'
-                        variant="ghost"
+                        variant="outline"
                         className="ml-2 mr-2"
                         onClick={() => handleResetPassword(item)}
                       >

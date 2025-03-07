@@ -51,7 +51,7 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
     const [isAddSubFolderDialogOpen, setIsAddSubFolderDialogOpen] = useState(false);
     const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
     const [user, setUser] = useState<User | null>(null);
-    const [showAllFolders, setShowAllFolders] = useState(true);
+    const [showAllFolders, setShowAllFolders] = useState(false);
 
     const toggleFolderView = () => {
         setShowAllFolders((prev) => !prev);
@@ -289,7 +289,7 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
                 </Button>
             ),
             cell: ({ row }) => {
-                const totalSize = row.original.files?.reduce((sum, file) => {
+                const totalSize = row.original.file_uploads?.reduce((sum, file) => {
                     const fileSize = Number(file.size) || 0;
                     return sum + fileSize;
                 }, 0) || 0;
@@ -298,21 +298,6 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
             },
             enableSorting: true,
         },
-        // {
-        //     accessorKey: 'local_path',
-        //     header: ({ column }) => (
-        //         <Button
-        //             variant='ghost'
-        //             className='pl-0 text-left hover:!bg-transparent'
-        //             onClick={() => column.toggleSorting()}
-        //         >
-        //             Folder Location (Local)
-        //             <ArrowUpDown className='ml-2 h-4 w-4' />
-        //         </Button>
-        //     ),
-        //     cell: ({ row }) => row.original.local_path,
-        //     enableSorting: true,
-        // },
         {
             accessorKey: 'coverage_period',
             header: ({ column }) => (
@@ -335,7 +320,15 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
             enableSorting: true,
         },
         {
-            id: 'actions',
+            accessorKey: 'added_by',
+            header: 'Added By',
+            cell: ({ row }) =>
+                row.original.added_by
+                    ? `${row.original.added_by.first_name} ${row.original.added_by.last_name}`
+                    : 'N/A',
+        },
+        {
+            accessorKey: 'actions',
             header: () => <div className='text-center'>Actions</div>,
             cell: ({ row }) => {
                 const upload_files = row.original.file_uploads ?? [];
@@ -420,6 +413,12 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
         }
 
     ];
+
+    // if (user?.role == 'admin') {
+    //     columns.push({
+
+    //     });
+    // }
 
     const pagination = React.useMemo(() => ({ pageIndex, pageSize }), [pageIndex, pageSize]);
 

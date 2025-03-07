@@ -29,26 +29,14 @@ export default function HomePage() {
           alt="Design Background"
           layout="fill"
           objectFit="cover"
-          objectPosition="bottom" 
+          objectPosition="bottom"
           className="w-full"
         />
-      </div>
 
-      <div className="max-w-3xl mx-auto p-6 bg-white shadow-xl rounded-2xl mt-8 text-center">
-        <h1 className="text-3xl font-bold text-gray-800">
-          Welcome{user ? `, ${user.first_name} ${user.last_name}` : ""}!
-        </h1>
-        <p className="text-gray-600 mt-2">
-          Stay updated with the latest files and notifications.
-        </p>
-
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-blue-100 p-4 rounded-lg shadow-md">
-            <h2 className="text-lg font-semibold text-blue-700">Recent Files</h2>
-            <p className="text-sm text-gray-600 mt-1">
-              Browse and access your recently uploaded documents.
-            </p>
-          </div>
+        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40">
+          <h1 className="text-4xl md:text-5xl font-bold text-white shadow-lg">
+            Welcome{user ? `, ${user.first_name} ${user.last_name}` : ""}!
+          </h1>
         </div>
       </div>
     </div>

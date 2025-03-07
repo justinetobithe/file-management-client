@@ -28,7 +28,6 @@ import { Department } from "@/types/Department";
 const reportSchema = z.object({
     effective_date: z.union([z.date(), z.null()]).optional(),
     folders: z.array(z.number()),
-    department_id: z.number().optional(),
     // checked_by: z.number().optional(),
 });
 
@@ -43,28 +42,14 @@ interface AppGenerateReportFormProps {
 
 const AppGenerateReportForm: React.FC<AppGenerateReportFormProps> = ({ isOpen, onClose, queryClient, selectedFolders }) => {
     const [loading, setLoading] = useState(false);
-    const [departments, setDepartments] = useState<Department[]>([]);
 
     const form = useForm<ReportInput>({
         resolver: zodResolver(reportSchema),
         defaultValues: {
             effective_date: undefined,
-            department_id: undefined,
             folders: selectedFolders,
         },
     });
-
-    useEffect(() => {
-        const fetchDeparments = async () => {
-            try {
-                const response = await api.get<{ data: Department[] }>('/api/departments');
-                setDepartments(response.data.data);
-            } catch (error) {
-                console.error("Error fetching departments:", error);
-            }
-        };
-        fetchDeparments();
-    }, []);
 
     const onSubmit = async (data: ReportInput) => {
 
@@ -76,16 +61,7 @@ const AppGenerateReportForm: React.FC<AppGenerateReportFormProps> = ({ isOpen, o
             return;
         }
 
-        if (!data.department_id) {
-            toast({
-                variant: 'destructive',
-                description: "Please select a depertment to check the report.",
-            });
-            return;
-        }
-
         const formData = {
-            department_id: data.department_id,
             effective_date: data.effective_date ? format(data.effective_date, "yyyy-MM-dd") : null,
             selected_folders: data.folders,
         };
@@ -119,7 +95,7 @@ const AppGenerateReportForm: React.FC<AppGenerateReportFormProps> = ({ isOpen, o
                 <AlertDialogHeader>
                     <AlertDialogTitle>Generate Report</AlertDialogTitle>
                 </AlertDialogHeader>
-                <div style={{ height: 250, }}>
+                <div >
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
 
@@ -140,29 +116,6 @@ const AppGenerateReportForm: React.FC<AppGenerateReportFormProps> = ({ isOpen, o
                                         <FormMessage />
                                     </FormItem>
                                 )}
-                            />
-
-                            <FormField
-                                control={form.control}
-                                name="department_id"
-                                render={({ field }) => {
-                                    return (
-                                        <FormItem>
-                                            <FormLabel>Checked By (Department)</FormLabel>
-                                            <FormControl>
-                                                <Select
-                                                    options={departments.map(department => ({
-                                                        value: department.id,
-                                                        label: department.name,
-                                                    }))}
-                                                    onChange={option => field.onChange(option?.value)}
-                                                    isClearable
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    );
-                                }}
                             />
 
                             <div className='mt-5 flex space-x-2'>

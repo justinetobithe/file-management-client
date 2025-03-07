@@ -1,5 +1,6 @@
 import { Department } from "./Department";
 import { UploadedFile } from "./UploadedFIle";
+import User from "./User";
 
 export interface Folder {
     id?: number;
@@ -9,7 +10,9 @@ export interface Folder {
     end_date?: string | null;
 
     parent_id?: number;
-    department_id?: number[];
+    department_id?: number[]
+
+    added_by?: User;
 
     files?: UploadedFile[];
     file_uploads?: UploadedFile[];
