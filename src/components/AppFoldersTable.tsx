@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Skeleton } from '@/components/ui/skeleton';
 import AppTable from '@/components/AppTable';
-import { ArrowUpDown, Pencil, Trash, Download, Search, Folder as FolderIcon, MoreHorizontal } from 'lucide-react';
+import { ArrowUpDown, Pencil, Trash, Download, Search, Folder as FolderIcon, MoreHorizontal, Menu } from 'lucide-react';
 import { Folder } from '@/types/Folder';
 import { useDeleteFolder, useFolders, useUpdateFolder, useDownloadZip } from '@/lib/FolderAPI';
 import { useQueryClient } from '@tanstack/react-query';
@@ -349,7 +349,7 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon">
-                                <MoreHorizontal className="w-5 h-5" />
+                                <Menu className="w-5 h-5" />
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">

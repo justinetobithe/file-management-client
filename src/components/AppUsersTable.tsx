@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/tooltip"
 import { Skeleton } from '@/components/ui/skeleton';
 import AppTable from '@/components/AppTable';
-import { ArrowUpDown, Pencil, Lock, Trash, UserCheck, UserCog, MoreHorizontal } from 'lucide-react';
+import { ArrowUpDown, Pencil, Lock, Trash, UserCheck, UserCog, MoreHorizontal, Menu } from 'lucide-react';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import User from '@/types/User';
 import { useDeleteUser, useUpdateUser, useUsers, useUpdateUserStatus } from '@/lib/UsersAPI';
@@ -217,7 +217,7 @@ export default function AppUsersTable() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon">
-                <MoreHorizontal className="w-5 h-5" />
+                <Menu className="w-5 h-5" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
