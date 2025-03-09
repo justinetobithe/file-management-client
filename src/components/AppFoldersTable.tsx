@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Skeleton } from '@/components/ui/skeleton';
 import AppTable from '@/components/AppTable';
-import { ArrowUpDown, Pencil, Trash, Download, Search, Folder as FolderIcon } from 'lucide-react';
+import { ArrowUpDown, Pencil, Trash, Download, Search, Folder as FolderIcon, MoreHorizontal } from 'lucide-react';
 import { Folder } from '@/types/Folder';
 import { useDeleteFolder, useFolders, useUpdateFolder, useDownloadZip } from '@/lib/FolderAPI';
 import { useQueryClient } from '@tanstack/react-query';
@@ -32,6 +32,7 @@ import debounce from 'lodash.debounce';
 import User from '@/types/User';
 import { api } from '@/lib/api';
 import AppSubFolderForm from './AppSubFolderForm';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 
 interface AppFoldersTableProps {
     setSelectedFolders: React.Dispatch<React.SetStateAction<number[]>>;
@@ -48,6 +49,7 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
     const [searchKeyword, setSearchKeyword] = React.useState('');
     const [sorting, setSorting] = useState<SortingState>([]);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [isAddSubFolderDialogOpen, setIsAddSubFolderDialogOpen] = useState(false);
     const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
     const [user, setUser] = useState<User | null>(null);
@@ -342,81 +344,73 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
             header: () => <div className='text-center'>Actions</div>,
             cell: ({ row }) => {
                 const upload_files = row.original.file_uploads ?? [];
-                const subfolders = row.original.subfolders ?? [];
 
                 return (
-                    <div className="flex justify-center items-center">
-                        <Dialog>
-                            <DialogTrigger asChild>
-                                <TooltipProvider>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <Button
-                                                type='button'
-                                                variant="default"
-                                                onClick={() => handleAddSubFolder(row.original)}
-                                            >
-                                                <FolderIcon className="h-4 w-4" />
-                                            </Button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            <p>Add Subfolder</p>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
-                            </DialogTrigger>
-                        </Dialog>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                                <MoreHorizontal className="w-5 h-5" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <DropdownMenuItem onClick={() => handleAddSubFolder(row.original)}>
+                                                    <FolderIcon className="w-4 h-4 mr-2" />
+                                                    Add Subfolder
+                                                </DropdownMenuItem>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>Add Subfolder</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </DialogTrigger>
+                            </Dialog>
 
-                        {upload_files.length > 0 && (
+                            {upload_files.length > 0 && (
+                                <DropdownMenuItem onClick={() => handleDownloadZip(row.original)}>
+                                    <Download className="w-4 h-4 mr-2" />
+                                    Download as ZIP
+                                </DropdownMenuItem>
+                            )}
+
                             <TooltipProvider>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
-                                        <Button
-                                            type='button'
-                                            variant="secondary"
-                                            className="ml-2"
-                                            onClick={() => handleDownloadZip(row.original)}
-                                        >
-                                            <Download className="h-4 w-4" />
-                                        </Button>
+
+                                        <DropdownMenuItem onClick={() => handleEditFolder(row.original)}>
+                                            <Pencil className="w-4 h-4 mr-2" />
+                                            Edit
+                                        </DropdownMenuItem>
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                        <p>Download as ZIP</p>
+                                        <p>Edit</p>
                                     </TooltipContent>
                                 </Tooltip>
                             </TooltipProvider>
-                        )}
 
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        type='button'
-                                        variant="outline"
-                                        className="mr-2 ml-2"
-                                        onClick={() => handleEditFolder(row.original)}
-                                    >
-                                        <Pencil className="h-4 w-4" />
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>Edit</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
+                            <AppConfirmationDialog
+                                isOpen={isDeleteDialogOpen}
+                                title="Delete Folder"
+                                description={`Are you sure you want to delete the folder "${row.original.folder_name}"? This action cannot be undone.`}
+                                buttonElem={
+                                    <DropdownMenuItem className="!w-full text-red-600" onSelect={(e) => e.preventDefault()}>
+                                        <Trash className="w-4 h-4 mr-2" />
+                                        Delete
+                                    </DropdownMenuItem>
+                                }
+                                handleDialogAction={() => {
+                                    handleDeleteFolder(row.original.id!);
+                                    setIsDeleteDialogOpen(false);
+                                }}
+                            />
 
-                        <AppConfirmationDialog
-                            title='Delete Folder'
-                            description={`Are you sure you want to delete the folder "${row.original.folder_name}"? This action cannot be undone.`}
-                            buttonElem={
-                                <Button className="text-white" variant="destructive" type='button'>
-                                    <Trash size={20} />
-                                </Button>
-                            }
-                            handleDialogAction={() => handleDeleteFolder(row.original.id!)}
-                        />
-
-                    </div>
+                        </DropdownMenuContent>
+                    </DropdownMenu >
                 );
             },
             enableSorting: false,

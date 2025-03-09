@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/tooltip"
 import { Skeleton } from '@/components/ui/skeleton';
 import AppTable from '@/components/AppTable';
-import { ArrowUpDown, Pencil, Lock, Trash, UserCheck, UserCog } from 'lucide-react';
+import { ArrowUpDown, Pencil, Lock, Trash, UserCheck, UserCog, MoreHorizontal } from 'lucide-react';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import User from '@/types/User';
 import { useDeleteUser, useUpdateUser, useUsers, useUpdateUserStatus } from '@/lib/UsersAPI';
@@ -27,6 +27,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 import AppResetPasswordForm from './AppResetPasswordForm';
 import AppPositionForm from './AppPositionForm';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 
 export default function AppUsersTable() {
   const queryClient = useQueryClient();
@@ -37,6 +38,7 @@ export default function AppUsersTable() {
   const [searchKeyword, setSearchKeyword] = React.useState('');
   const [sorting, setSorting] = useState<SortingState>([]);
   const [isEditUserDialogOpen, setIsEditUserDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isEditPositionDialogOpen, setIsEditPositionDialogOpen] = useState(false);
   const [isResetPasswordDialogOpen, setIsResetPasswordDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -211,98 +213,89 @@ export default function AppUsersTable() {
       cell: ({ row }) => {
         const item = row.original;
         return (
-          <div className="flex justify-center items-center">
-            <Dialog>
-              <DialogTrigger asChild>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        type='button'
-                        variant="secondary"
-                        onClick={() => handleEditPosition(item)}
-                      >
-                        <UserCog className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Position</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </DialogTrigger>
-              {item.status == 0 && (
-                <AppConfirmationDialog
-                  title='Approve User'
-                  description={`Are you sure you want to activate the user "${item.first_name} ${item.last_name}"?`}
-                  buttonElem={
-                    <Button
-                      className="text-white"
-                      variant="success"
-                      type='button'
-                    >
-                      <UserCheck size={20} />
-                    </Button>
-                  }
-                  handleDialogAction={() => handleApproveUser(item.id!)}
-                />
-              )}
-              <DialogTrigger asChild>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        type='button'
-                        variant="default"
-                        className="ml-2 mr-2"
-                        onClick={() => handleEditUser(item)}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Edit</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </DialogTrigger>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <MoreHorizontal className="w-5 h-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <DropdownMenuItem onClick={() => handleEditPosition(item)}>
+                          <UserCog className="w-4 h-4 mr-2" />
+                          Position
+                        </DropdownMenuItem>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Position</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </DialogTrigger>
+              </Dialog>
+
+              <Dialog>
+                <DialogTrigger asChild>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <DropdownMenuItem onClick={() => handleEditUser(item)}>
+                          <Pencil className="w-4 h-4 mr-2" />
+                          Edit
+                        </DropdownMenuItem>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Edit</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </DialogTrigger>
+              </Dialog>
+
               <AppConfirmationDialog
-                title="Delete User"
+                isOpen={isDeleteDialogOpen}
+                title="Delete Folder"
                 description={`Are you sure you want to delete "${item.first_name} ${item.last_name}"? This action cannot be undone.`}
                 buttonElem={
-                  <Button
-                    className="text-white"
-                    variant="destructive"
-                    type='button'
-                  >
-                    <Trash size={20} />
-                  </Button>
+                  <DropdownMenuItem className="!w-full text-red-600" onSelect={(e) => e.preventDefault()}>
+                    <Trash className="w-4 h-4 mr-2" />
+                    Delete
+                  </DropdownMenuItem>
                 }
                 requirePassword={true}
-                handleDialogAction={(password) => handleDeleteUser(item.id, password ?? "")}
+                handleDialogAction={(password) => {
+                  handleDeleteUser(item.id, password ?? "")
+                  setIsDeleteDialogOpen(false);
+                }}
               />
 
-              <DialogTrigger asChild>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        type='button'
-                        variant="outline"
-                        className="ml-2 mr-2"
-                        onClick={() => handleResetPassword(item)}
-                      >
-                        <Lock className="h-4 w-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Reset Password</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </DialogTrigger>
-            </Dialog>
-          </div>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <DropdownMenuItem onClick={() => handleResetPassword(item)}>
+                          <Lock className="w-4 h-4 mr-2" />
+                          Reset Password
+                        </DropdownMenuItem>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Reset Password</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </DialogTrigger>
+              </Dialog>
+
+
+            </DropdownMenuContent>
+          </DropdownMenu >
+
         );
       },
       enableSorting: false,
