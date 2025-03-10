@@ -37,7 +37,7 @@ const folderSchema = z.object({
     start_date: z.union([z.date(), z.null()]).optional(),
     end_date: z.union([z.date(), z.null()]).optional(),
     department_id: z.array(z.number()).optional(),
-    parent_id: z.number().optional(),
+    parent_id: z.number().nullable().optional(),
     uploaded_files: z.array(
         z.object({
             id: z.number(),
@@ -115,7 +115,8 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
             start_date: data?.start_date ? new Date(data.start_date) : null,
             end_date: data?.end_date ? new Date(data.end_date) : null,
             department_id: data?.departments?.map(dept => dept.id).filter(id => id !== undefined) ?? [],
-            parent_id: data?.parent_id || undefined,
+            parent_id: data?.parent_id ?? null,
+
         },
     });
 
@@ -136,7 +137,8 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
                 start_date: data?.start_date ? new Date(data.start_date) : null,
                 end_date: data?.end_date ? new Date(data.end_date) : null,
                 department_id: data?.departments?.map(dept => dept.id).filter(id => id !== undefined) ?? [],
-                parent_id: data?.parent_id || undefined,
+                parent_id: data?.parent_id ?? null,
+
             });
         }
     }, [isOpen, data, form]);
