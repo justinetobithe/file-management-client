@@ -67,6 +67,8 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
     const [departments, setDepartments] = useState<Department[]>([]);
     const [folders, setFolders] = useState<Folder[]>([]);
 
+    console.log("data ", data)
+
     const [user, setUser] = useState<User | null>(null);
 
     useEffect(() => {
@@ -354,25 +356,19 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Parent Folder</FormLabel>
-                                        <Controller
-                                            control={form.control}
-                                            name="parent_id"
-                                            render={({ field }) => (
-                                                <Select
-                                                    defaultValue={folders.find(folder => folder.id === field.value) ? {
-                                                        value: field.value,
-                                                        label: folders.find(folder => folder.id === field.value)?.folder_name,
-                                                    } : null}
-                                                    options={folders
-                                                        .filter(folder => folder.id !== data?.id)
-                                                        .map(folder => ({
-                                                            value: folder.id,
-                                                            label: folder.folder_name,
-                                                        }))}
-                                                    onChange={option => field.onChange(option?.value)}
-                                                    isClearable
-                                                />
-                                            )}
+                                        <Select
+                                            defaultValue={folders.find(folder => folder.id === field.value) ? {
+                                                value: field.value,
+                                                label: folders.find(folder => folder.id === field.value)?.folder_name,
+                                            } : null}
+                                            options={folders
+                                                .filter(folder => folder.id !== data?.id)
+                                                .map(folder => ({
+                                                    value: folder.id,
+                                                    label: folder.folder_name,
+                                                }))}
+                                            onChange={option => field.onChange(option?.value)}
+                                            isClearable
                                         />
                                         <FormMessage />
                                     </FormItem>
