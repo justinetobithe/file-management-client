@@ -114,7 +114,7 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
             // local_path: data?.local_path || '',
             start_date: data?.start_date ? new Date(data.start_date) : null,
             end_date: data?.end_date ? new Date(data.end_date) : null,
-            department_id: data?.departments?.map(dept => dept.id) ?? [],
+            department_id: data?.departments?.map(dept => dept.id).filter(id => id !== undefined) ?? [],
             parent_id: data?.parent_id || undefined,
         },
     });
@@ -135,7 +135,7 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
                 // local_path: data?.local_path || '',
                 start_date: data?.start_date ? new Date(data.start_date) : null,
                 end_date: data?.end_date ? new Date(data.end_date) : null,
-                department_id: data?.departments?.map(dept => dept.id) ?? [],
+                department_id: data?.departments?.map(dept => dept.id).filter(id => id !== undefined) ?? [],
                 parent_id: data?.parent_id || undefined,
             });
         }
@@ -188,7 +188,7 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
             formattedData.append('end_date', format(new Date(formData.end_date), 'yyyy-MM-dd'));
         }
 
-        if (formData.parent_id === undefined) {
+        if (formData.parent_id === undefined || formData.parent_id === null) {
             formattedData.delete('parent_id');
         }
 
@@ -357,7 +357,7 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
                                             name="parent_id"
                                             render={({ field }) => (
                                                 <Select
-                                                    value={folders.find(folder => folder.id === field.value) ? {
+                                                    defaultValue={folders.find(folder => folder.id === field.value) ? {
                                                         value: field.value,
                                                         label: folders.find(folder => folder.id === field.value)?.folder_name,
                                                     } : null}

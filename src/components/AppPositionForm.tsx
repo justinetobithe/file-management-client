@@ -132,7 +132,7 @@ const AppPositionForm: FC<AppPositionFormProps> = ({ user, isOpen, onClose, quer
                                     <FormItem>
                                         <FormLabel>Department</FormLabel>
                                         <Select
-                                            value={departments.find(dep => dep.id === field.value) ? {
+                                            defaultValue={departments.find(dep => dep.id === field.value) ? {
                                                 value: field.value,
                                                 label: departments.find(dep => dep.id === field.value)?.name,
                                             } : null}
@@ -154,7 +154,7 @@ const AppPositionForm: FC<AppPositionFormProps> = ({ user, isOpen, onClose, quer
                                     <FormItem>
                                         <FormLabel>Designation</FormLabel>
                                         <Select
-                                            value={designations.find(des => des.id === field.value) ? {
+                                            defaultValue={designations.find(des => des.id === field.value) ? {
                                                 value: field.value,
                                                 label: designations.find(des => des.id === field.value)?.designation,
                                             } : null}
