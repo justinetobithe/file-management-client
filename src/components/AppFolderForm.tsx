@@ -117,8 +117,7 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
             start_date: data?.start_date ? new Date(data.start_date) : null,
             end_date: data?.end_date ? new Date(data.end_date) : null,
             department_id: data?.departments?.map(dept => dept.id).filter(id => id !== undefined) ?? [],
-            parent_id: Number(data?.parent_id) ?? null,
-
+            parent_id: data?.parent_id !== undefined && data?.parent_id !== null ? Number(data.parent_id) : null,
         },
     });
 
@@ -139,7 +138,8 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
                 start_date: data?.start_date ? new Date(data.start_date) : null,
                 end_date: data?.end_date ? new Date(data.end_date) : null,
                 department_id: data?.departments?.map(dept => dept.id).filter(id => id !== undefined) ?? [],
-                parent_id: Number(data?.parent_id) ?? null,
+                parent_id: data?.parent_id !== undefined && data?.parent_id !== null ? Number(data.parent_id) : null,
+
 
             });
         }
@@ -192,7 +192,7 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
             formattedData.append('end_date', format(new Date(formData.end_date), 'yyyy-MM-dd'));
         }
 
-        if (formData.parent_id === undefined || formData.parent_id === null) {
+        if (!formData.parent_id) {
             formattedData.delete('parent_id');
         }
 
