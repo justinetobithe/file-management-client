@@ -34,12 +34,13 @@ import { api } from '@/lib/api';
 import AppSubFolderForm from './AppSubFolderForm';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 
-interface AppFoldersTableProps {
+interface AppShowFoldersTableProps {
+
     setSelectedFolders: React.Dispatch<React.SetStateAction<number[]>>;
     selectedFolders: number[];
 }
 
-export default function AppFoldersTable({ setSelectedFolders, selectedFolders }: AppFoldersTableProps) {
+export default function AppShowFoldersTable({ setSelectedFolders, selectedFolders }: AppShowFoldersTableProps) {
 
     const queryClient = useQueryClient();
     const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
@@ -337,27 +338,27 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
             },
             enableSorting: true,
         },
-        // {
-        //     accessorKey: 'coverage_period',
-        //     header: ({ column }) => (
-        //         <Button
-        //             variant='ghost'
-        //             className='pl-0 text-left hover:!bg-transparent'
-        //         >
-        //             Coverage Period
-        //         </Button>
-        //     ),
-        //     cell: ({ row }) => {
-        //         const { start_date, end_date } = row.original;
+        {
+            accessorKey: 'coverage_period',
+            header: ({ column }) => (
+                <Button
+                    variant='ghost'
+                    className='pl-0 text-left hover:!bg-transparent'
+                >
+                    Coverage Period
+                </Button>
+            ),
+            cell: ({ row }) => {
+                const { start_date, end_date } = row.original;
 
-        //         if (!start_date || !end_date) {
-        //             return "N/A";
-        //         }
-        //         return `${format(new Date(start_date), "MMM dd, yyyy")} - ${format(new Date(end_date), "MMM dd, yyyy")}`;
-        //     },
+                if (!start_date || !end_date) {
+                    return "N/A";
+                }
+                return `${format(new Date(start_date), "MMM dd, yyyy")} - ${format(new Date(end_date), "MMM dd, yyyy")}`;
+            },
 
-        //     enableSorting: true,
-        // },
+            enableSorting: true,
+        },
         {
             accessorKey: 'added_by',
             header: 'Added By',
@@ -403,122 +404,6 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
             },
             enableSorting: true,
         },
-        {
-            accessorKey: 'actions',
-            header: () => <div className='text-center'>Actions</div>,
-            cell: ({ row }) => {
-                const upload_files = row.original.file_uploads ?? [];
-
-                return (
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                                <Menu className="w-5 h-5" />
-                            </Button>
-                        </DropdownMenuTrigger>
-
-                        <DropdownMenuContent align="end">
-
-                            {
-                                row.original.status === 'pending' &&
-                                user?.position?.section_head === 1 && (
-                                    <>
-                                        <TooltipProvider>
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <DropdownMenuItem onClick={() => handleApproveFolder(row.original.id!)}>
-                                                        <Check className="w-4 h-4 mr-2" />
-                                                        Approve
-                                                    </DropdownMenuItem>
-                                                </TooltipTrigger>
-                                                <TooltipContent><p>Approve</p></TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
-
-                                        <TooltipProvider>
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <DropdownMenuItem onClick={() => handleRejectFolder(row.original.id!)}>
-                                                        <Ban className="w-4 h-4 mr-2" />
-                                                        Reject
-                                                    </DropdownMenuItem>
-                                                </TooltipTrigger>
-                                                <TooltipContent><p>Reject</p></TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
-                                    </>
-                                )
-                            }
-                            {/* 
-                            {
-                                user?.id == row.original.added_by && (
-                                    <> */}
-                            <Dialog>
-                                <DialogTrigger asChild>
-                                    <TooltipProvider>
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <DropdownMenuItem onClick={() => handleAddSubFolder(row.original)}>
-                                                    <FolderIcon className="w-4 h-4 mr-2" />
-                                                    Add Subfolder
-                                                </DropdownMenuItem>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                                <p>Add Subfolder</p>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </TooltipProvider>
-                                </DialogTrigger>
-                            </Dialog>
-
-                            {upload_files.length > 0 && (
-                                <DropdownMenuItem onClick={() => handleDownloadZip(row.original)}>
-                                    <Download className="w-4 h-4 mr-2" />
-                                    Download as ZIP
-                                </DropdownMenuItem>
-                            )}
-
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-
-                                        <DropdownMenuItem onClick={() => handleEditFolder(row.original)}>
-                                            <Pencil className="w-4 h-4 mr-2" />
-                                            Edit
-                                        </DropdownMenuItem>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>Edit</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
-
-
-                            <AppConfirmationDialog
-                                isOpen={isDeleteDialogOpen}
-                                title="Delete Folder"
-                                description={`Are you sure you want to delete the folder "${row.original.folder_name}"? This action cannot be undone.`}
-                                buttonElem={
-                                    <DropdownMenuItem className="!w-full text-red-600" onSelect={(e) => e.preventDefault()}>
-                                        <Trash className="w-4 h-4 mr-2" />
-                                        Delete
-                                    </DropdownMenuItem>
-                                }
-                                handleDialogAction={() => {
-                                    handleDeleteFolder(row.original.id!);
-                                    setIsDeleteDialogOpen(false);
-                                }}
-                            />
-                            {/* </>
-                                )
-                            } */}
-                        </DropdownMenuContent>
-                    </DropdownMenu >
-                );
-            },
-            enableSorting: false,
-            enableHiding: false,
-        }
 
     ];
 

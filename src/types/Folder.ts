@@ -10,9 +10,12 @@ export interface Folder {
     end_date?: string | null;
 
     parent_id?: number;
-    department_id?: number[]
+    // department_id?: number[]
+    department_id?: number;
 
     added_by?: User;
+
+    status?: string;
 
     files?: UploadedFile[];
     file_uploads?: UploadedFile[];
@@ -20,7 +23,8 @@ export interface Folder {
     subfolders?: Folder[];
     downloadUrl?: string;
 
-    departments?: Department[];
+    // departments?: Department[];
+    department?: Department;
 
     uploaded_files?: UploadedFile[];
 

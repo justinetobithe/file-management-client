@@ -47,8 +47,8 @@ const routes: Route[] = [
     child_routes: [],
   },
   {
-    route: '/files',
-    title: 'Files',
+    route: '/folders',
+    title: 'Folders',
     icon: <Folder />,
     roles: ['admin', 'user'],
     isSidebarVisible: true,

@@ -66,6 +66,17 @@ export const downloadZip = async (id: number): Promise<Response> => {
     return response.data;
 };
 
+export const approveFolder = async (id: number): Promise<Response> => {
+    const response = await api.post(`/api/folder/${id}/approve`);
+    return response.data;
+};
+
+export const rejectFolder = async (id: number): Promise<Response> => {
+    const response = await api.post(`/api/folder/${id}/reject`);
+    return response.data;
+};
+
+
 export const useFolders = (
     page: number,
     pageSize: number,
@@ -170,6 +181,38 @@ export const useDownloadZip = () => {
                 //     variant: 'success',
                 //     description: response.message,
                 // });
+            }
+        },
+    });
+};
+
+export const useApproveFolder = () => {
+    return useMutation({
+        mutationFn: async (id: number) => {
+            return await approveFolder(id);
+        },
+        onSuccess: (response) => {
+            if (response && response.status === "success") {
+                toast({
+                    variant: 'success',
+                    description: response.message || 'Folder approved successfully!',
+                });
+            }
+        },
+    });
+};
+
+export const useRejectFolder = () => {
+    return useMutation({
+        mutationFn: async (id: number) => {
+            return await rejectFolder(id);
+        },
+        onSuccess: (response) => {
+            if (response && response.status === "success") {
+                toast({
+                    variant: 'success',
+                    description: response.message || 'Folder rejected successfully!',
+                });
             }
         },
     });

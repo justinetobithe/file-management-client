@@ -433,7 +433,6 @@ const ProfileForm: FC<{ user: User }> = ({ user }) => {
                 />
 
                 <div className='grid gap-x-10 sm:grid-cols-3 mt-5'>
-
                   <FormField
                     control={form.control}
                     name='current_password'

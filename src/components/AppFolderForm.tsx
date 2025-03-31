@@ -34,9 +34,10 @@ const folderSchema = z.object({
     id: z.number().optional(),
     folder_name: z.string().min(1, { message: 'Folder name is required' }),
     // local_path: z.string().min(1, { message: 'Path is required' }),
-    start_date: z.union([z.date(), z.null()]).optional(),
-    end_date: z.union([z.date(), z.null()]).optional(),
-    department_id: z.array(z.number()).optional(),
+    // start_date: z.union([z.date(), z.null()]).optional(),
+    // end_date: z.union([z.date(), z.null()]).optional(),
+    // department_id: z.array(z.number()).optional(),
+    department_id: z.number().nullable().optional(),
     parent_id: z.number().nullable().optional(),
     uploaded_files: z.array(
         z.object({
@@ -66,8 +67,6 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
 
     const [departments, setDepartments] = useState<Department[]>([]);
     const [folders, setFolders] = useState<Folder[]>([]);
-
-    console.log("data ", data)
 
     const [user, setUser] = useState<User | null>(null);
 
@@ -114,18 +113,19 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
             id: data?.id,
             folder_name: data?.folder_name || '',
             // local_path: data?.local_path || '',
-            start_date: data?.start_date ? new Date(data.start_date) : null,
-            end_date: data?.end_date ? new Date(data.end_date) : null,
-            department_id: data?.departments?.map(dept => dept.id).filter(id => id !== undefined) ?? [],
+            // start_date: data?.start_date ? new Date(data.start_date) : null,
+            // end_date: data?.end_date ? new Date(data.end_date) : null,
+            // department_id: data?.departments?.map(dept => dept.id).filter(id => id !== undefined) ?? [],
+            department_id: data?.department_id ?? user?.position?.department_id,
             parent_id: data?.parent_id !== undefined && data?.parent_id !== null ? Number(data.parent_id) : null,
         },
     });
 
-    useEffect(() => {
-        if (user && user?.position?.department_id) {
-            form.setValue("department_id", [Number(user?.position?.department_id)]);
-        }
-    }, [user, form]);
+    // useEffect(() => {
+    //     if (user && user?.position?.department_id) {
+    //         form.setValue("department_id", [Number(user?.position?.department_id)]);
+    //     }
+    // }, [user, form]);
 
     useEffect(() => {
         if (isOpen) {
@@ -135,9 +135,10 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
             form.reset({
                 folder_name: data?.folder_name || '',
                 // local_path: data?.local_path || '',
-                start_date: data?.start_date ? new Date(data.start_date) : null,
-                end_date: data?.end_date ? new Date(data.end_date) : null,
-                department_id: data?.departments?.map(dept => dept.id).filter(id => id !== undefined) ?? [],
+                // start_date: data?.start_date ? new Date(data.start_date) : null,
+                // end_date: data?.end_date ? new Date(data.end_date) : null,
+                // department_id: data?.departments?.map(dept => dept.id).filter(id => id !== undefined) ?? [],
+                department_id: data?.department_id ?? user?.position?.department_id,
                 parent_id: data?.parent_id !== undefined && data?.parent_id !== null ? Number(data.parent_id) : null,
 
 
@@ -181,16 +182,16 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
             formattedData.append(key, value as string);
         });
 
-        if (formData.department_id && formData.department_id.length > 0) {
-            formData.department_id.forEach(id => formattedData.append("department_id[]", id.toString()));
-        }
+        // if (formData.department_id && formData.department_id.length > 0) {
+        //     formData.department_id.forEach(id => formattedData.append("department_id[]", id.toString()));
+        // }
 
-        if (formData.start_date) {
-            formattedData.append('start_date', format(new Date(formData.start_date), 'yyyy-MM-dd'));
-        }
-        if (formData.end_date) {
-            formattedData.append('end_date', format(new Date(formData.end_date), 'yyyy-MM-dd'));
-        }
+        // if (formData.start_date) {
+        //     formattedData.append('start_date', format(new Date(formData.start_date), 'yyyy-MM-dd'));
+        // }
+        // if (formData.end_date) {
+        //     formattedData.append('end_date', format(new Date(formData.end_date), 'yyyy-MM-dd'));
+        // }
 
         if (!formData.parent_id) {
             formattedData.delete('parent_id');
@@ -271,7 +272,7 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
                                 )}
                             /> */}
 
-                            <Controller
+                            {/* <Controller
                                 control={form.control}
                                 name='start_date'
                                 render={({ field }) => (
@@ -307,9 +308,9 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
                                         <FormMessage />
                                     </FormItem>
                                 )}
-                            />
+                            /> */}
 
-                            <FormField
+                            {/* <FormField
                                 control={form.control}
                                 name="department_id"
                                 render={({ field }) => (
@@ -347,7 +348,7 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
                                         <FormMessage />
                                     </FormItem>
                                 )}
-                            />
+                            /> */}
 
 
                             <FormField
