@@ -10,8 +10,8 @@ export const getFolders = async (
     filter = '',
     sortColumn = '',
     sortDesc = false,
-    department_id = null,
     all_folders = true,
+    status = ''
 ): Promise<{ data: Folder[]; last_page: number }> => {
     const response = await api.get<{ data: { data: Folder[]; current_page: number; last_page: number; total: number } }>(`/api/folders`, {
         params: {
@@ -20,8 +20,8 @@ export const getFolders = async (
             ...(filter && { filter }),
             ...(sortColumn && { sort_column: sortColumn }),
             sort_desc: sortDesc,
-            ...(department_id !== null && { department_id }),
-            all_folders: all_folders ?? false
+            all_folders: all_folders ?? false,
+            status: status ?? '',
         },
     });
 
@@ -35,7 +35,7 @@ export const getFolders = async (
 
 export const showFolder = async (id: number): Promise<Response> => {
     const response = await api.get(`/api/folder/${id}`);
-    return response.data;
+    return response.data.data;
 };
 
 export const createFolder = async (inputs: Folder): Promise<Response> => {
@@ -76,6 +76,32 @@ export const rejectFolder = async (id: number): Promise<Response> => {
     return response.data;
 };
 
+export const addFolder = async (inputs: Folder): Promise<Response> => {
+    const response = await api.post<Response>(`/api/folder/add`, inputs, {
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+    return response.data;
+};
+
+export const addSubfolder = async (inputs: Folder): Promise<Response> => {
+    const response = await api.post<Response>(`/api/folder`, inputs, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+    return response.data;
+};
+
+export const updateSubfolder = async (id: number, inputs: Folder): Promise<Response> => {
+    const response = await api.post<Response>(`/api/folder/${id}`, inputs, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+    return response.data;
+};
 
 export const useFolders = (
     page: number,
@@ -83,11 +109,11 @@ export const useFolders = (
     searchKeyword?: string,
     sortBy?: string,
     sortDesc?: boolean,
-    departmentId?: number,
-    allFolders?: boolean
+    allFolders?: boolean,
+    status?: string
 ) => {
     return useQuery({
-        queryKey: ['folders', page, pageSize, searchKeyword, sortBy, sortDesc, departmentId, allFolders],
+        queryKey: ['folders', page, pageSize, searchKeyword, sortBy, sortDesc, allFolders, status],
         queryFn: async () => {
             const response = await api.get('/api/folders', {
                 params: {
@@ -96,8 +122,8 @@ export const useFolders = (
                     search: searchKeyword,
                     sort_by: sortBy,
                     sort_desc: sortDesc,
-                    department_id: departmentId,
-                    all_folders: allFolders
+                    all_folders: allFolders,
+                    status: status,
                 },
             });
 
@@ -212,6 +238,54 @@ export const useRejectFolder = () => {
                 toast({
                     variant: 'success',
                     description: response.message || 'Folder rejected successfully!',
+                });
+            }
+        },
+    });
+};
+
+export const useAddFolder = () => {
+    return useMutation({
+        mutationFn: async (inputs: Folder) => {
+            return await addFolder(inputs);
+        },
+        onSuccess: (response) => {
+            if (response && response.status === 'success') {
+                toast({
+                    variant: 'success',
+                    description: response.message,
+                });
+            }
+        },
+    });
+};
+
+export const useAddSubFolder = () => {
+    return useMutation({
+        mutationFn: async (inputs: Folder) => {
+            return await addSubfolder(inputs);
+        },
+        onSuccess: (response) => {
+            if (response && response.status === "success") {
+                toast({
+                    variant: 'success',
+                    description: response.message,
+                });
+            }
+        },
+    });
+};
+
+export const useUpdateSubFolder = () => {
+    return useMutation({
+        mutationFn: async ({ id, folderData }: { id: number; folderData: Folder }) => {
+            return await updateSubfolder(id, folderData);
+        },
+        onSuccess: (response) => {
+            if (response && response.status === "success") {
+                toast({
+                    variant: 'success',
+                    description: response.message,
                 });
             }
         },

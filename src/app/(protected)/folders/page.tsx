@@ -8,6 +8,7 @@ import AppFoldersTable from '@/components/AppFoldersTable';
 import AppGenerateReportForm from '@/components/AppGenerateReportForm';
 import User from '@/types/User';
 import { api } from '@/lib/api';
+import AppFolderOnlyForm from '@/components/AppFolderOnlyForm';
 
 const Page = () => {
     const queryClient = useQueryClient();
@@ -41,7 +42,7 @@ const Page = () => {
                             <h1 className="text-[1rem] font-bold">{user.position?.department?.name}</h1>
                             <h2 className="text-[1rem] font-bold">{user.first_name} {user.last_name}</h2>
                             <h3 className="text-[1rem] font-bold">{user.position?.designation?.designation}</h3>
-                        </div> 
+                        </div>
                     </>
                 ) : (
                     <h1 className="text-[2rem] font-bold">Folders</h1>
@@ -49,7 +50,7 @@ const Page = () => {
 
                 <div className="flex gap-2">
                     <Button onClick={() => setIsAddFolderDialogOpen(true)}>
-                        <Plus className="mr-2" /> Add Folders
+                        <Plus className="mr-2" /> Add Folder
                     </Button>
 
                     {selectedFolders.length > 0 && (
@@ -66,7 +67,8 @@ const Page = () => {
             />
 
             {isAddFolderDialogOpen && (
-                <AppFolderForm
+                // <AppFolderForm
+                <AppFolderOnlyForm
                     onClose={() => setIsAddFolderDialogOpen(false)}
                     isOpen={isAddFolderDialogOpen}
                     queryClient={queryClient}

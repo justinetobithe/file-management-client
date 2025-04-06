@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Skeleton } from '@/components/ui/skeleton';
 import AppTable from '@/components/AppTable';
-import { ArrowUpDown, Pencil, Trash, Download, Search, Folder as FolderIcon, MoreHorizontal, Menu, Check, Ban } from 'lucide-react';
+import { ArrowUpDown, Pencil, Trash, Download, Search, Folder as FolderIcon, MoreHorizontal, Menu, Check, Ban, Dot } from 'lucide-react';
 import { Folder } from '@/types/Folder';
 import { useDeleteFolder, useFolders, useUpdateFolder, useDownloadZip, useApproveFolder, useRejectFolder } from '@/lib/FolderAPI';
 import { useQueryClient } from '@tanstack/react-query';
@@ -32,12 +32,25 @@ import debounce from 'lodash.debounce';
 import User from '@/types/User';
 import { api } from '@/lib/api';
 import AppSubFolderForm from './AppSubFolderForm';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu'; 
+import Select from 'react-select';
 
 interface AppFoldersTableProps {
     setSelectedFolders: React.Dispatch<React.SetStateAction<number[]>>;
     selectedFolders: number[];
 }
+
+interface StatusOption {
+    value: string | undefined;
+    label: string;
+}
+
+const statusOptions: StatusOption[] = [
+    { value: undefined, label: 'All Statuses' },
+    { value: 'pending', label: 'Pending' },
+    { value: 'approved', label: 'Approved' },
+    { value: 'rejected', label: 'Rejected' },
+];
 
 export default function AppFoldersTable({ setSelectedFolders, selectedFolders }: AppFoldersTableProps) {
 
@@ -54,6 +67,7 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
     const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
     const [user, setUser] = useState<User | null>(null);
     const [showAllFolders, setShowAllFolders] = useState(false);
+    const [statusFilter, setStatusFilter] = useState<StatusOption | null>(statusOptions[0]);
 
     const toggleFolderView = () => {
         setShowAllFolders((prev) => !prev);
@@ -88,8 +102,8 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
         searchKeyword,
         sorting.map((item) => item.id).join(','),
         Boolean(sorting.map((item) => item.desc).join(',')),
-        user?.position?.department_id,
-        showAllFolders
+        showAllFolders,
+        statusFilter?.value
     );
 
     const { mutate } = useDeleteFolder();
@@ -169,6 +183,11 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
                 ? prevSelected.filter((folderId: number) => folderId !== id)
                 : [...prevSelected, id]
         );
+    };
+
+    const handleStatusFilterChange = (selectedOption: StatusOption | null) => {
+        setStatusFilter(selectedOption);
+        setPagination({ pageIndex: 0, pageSize });
     };
 
 
@@ -276,7 +295,16 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
                     <ArrowUpDown className='ml-2 h-4 w-4' />
                 </Button>
             ),
-            cell: ({ row }) => row.original.subfolders?.map(f => f.folder_name).join(", "),
+            cell: ({ row }) => (
+                <ul>
+                    {row.original.subfolders?.map(f => (
+                        <li key={f.folder_name} className="flex items-center space-x-2">
+                            <Dot className="text-gray-500" />
+                            <span>{f.folder_name}</span>
+                        </li>
+                    ))}
+                </ul>
+            ),
             enableSorting: true,
         },
         {
@@ -358,14 +386,18 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
 
         //     enableSorting: true,
         // },
-        {
-            accessorKey: 'added_by',
-            header: 'Added By',
-            cell: ({ row }) =>
-                row.original.added_by
-                    ? `${row.original.added_by.first_name} ${row.original.added_by.last_name}`
-                    : 'N/A',
-        },
+        ...(user?.position?.section_head === 1
+            ? [
+                {
+                    accessorKey: 'added_by',
+                    header: 'Added By',
+                    cell: ({ row }: { row: { original: Folder } }) =>
+                        row.original.added_by
+                            ? `${row.original.added_by.first_name} ${row.original.added_by.last_name}`
+                            : 'N/A',
+                },
+            ]
+            : []),
         {
             accessorKey: 'status',
             header: ({ column }) => (
@@ -484,7 +516,8 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
 
                                         <DropdownMenuItem onClick={() => handleEditFolder(row.original)}>
                                             <Pencil className="w-4 h-4 mr-2" />
-                                            Edit
+                                            {/* Edit */}
+                                            Add/Edit Files
                                         </DropdownMenuItem>
                                     </TooltipTrigger>
                                     <TooltipContent>
@@ -525,7 +558,7 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
     const pagination = React.useMemo(() => ({ pageIndex, pageSize }), [pageIndex, pageSize]);
 
     const table = useReactTable({
-        data: data?.data ?? Array(10).fill({}),
+        data: data?.data?.data ?? Array(10).fill({}),
         columns: isLoading
             ? columns.map((column) => ({ ...column, cell: () => <Skeleton className='h-12 w-full' /> }))
             : columns,
@@ -562,7 +595,46 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
                         {showAllFolders ? 'Show Main Folders Only' : 'Show All Folders'}
                     </Button>
                 </div>
+
+                <div className="flex items-center gap-2">
+                    <div className="w-40">
+                        <Select
+                            options={statusOptions}
+                            value={statusFilter}
+                            onChange={handleStatusFilterChange}
+                            isClearable={false}
+                            placeholder="Filter by Status"
+                        />
+                    </div>
+                </div>
             </div>
+
+            {/* <div className="flex items-center justify-between w-full">
+                <div className="relative w-full max-w-xs">
+                    <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                    <Input
+                        type="text"
+                        placeholder="Search..."
+                        className="pl-10"
+                        onChange={handleSearchChange}
+                    />
+
+                </div>
+                <Button onClick={toggleFolderView} className="ml-3">
+                    {showAllFolders ? 'Show Main Folders Only' : 'Show All Folders'}
+                </Button>
+                <div className="flex items-center gap-2">
+                    <div className="w-40">
+                        <Select
+                            options={statusOptions}
+                            value={statusFilter}
+                            onChange={handleStatusFilterChange}
+                            isClearable={false}
+                            placeholder="Filter by Status"
+                        />
+                    </div>
+                </div>
+            </div> */}
 
             <AppTable table={table} />
             {selectedFolder && (

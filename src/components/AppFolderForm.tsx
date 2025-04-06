@@ -33,12 +33,6 @@ import User from '@/types/User';
 const folderSchema = z.object({
     id: z.number().optional(),
     folder_name: z.string().min(1, { message: 'Folder name is required' }),
-    // local_path: z.string().min(1, { message: 'Path is required' }),
-    // start_date: z.union([z.date(), z.null()]).optional(),
-    // end_date: z.union([z.date(), z.null()]).optional(),
-    // department_id: z.array(z.number()).optional(),
-    department_id: z.number().nullable().optional(),
-    parent_id: z.number().nullable().optional(),
     uploaded_files: z.array(
         z.object({
             id: z.number(),
@@ -65,8 +59,6 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
     const [currentFiles, setCurrentFiles] = useState<UploadedFile[]>([]);
     const [removedFileIds, setRemovedFileIds] = useState<number[]>([]);
 
-    const [departments, setDepartments] = useState<Department[]>([]);
-    const [folders, setFolders] = useState<Folder[]>([]);
 
     const [user, setUser] = useState<User | null>(null);
 
@@ -83,49 +75,13 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
         fetchUser();
     }, []);
 
-    useEffect(() => {
-        const fetchDepartments = async () => {
-            try {
-                const response = await api.get<{ data: Department[] }>('/api/departments');
-                setDepartments(response.data.data);
-            } catch (error) {
-                console.error("Error fetching departments:", error);
-            }
-        };
-        fetchDepartments();
-    }, []);
-
-    useEffect(() => {
-        const fetchFolders = async () => {
-            try {
-                const response = await api.get<{ data: Folder[] }>('/api/folders');
-                setFolders(response.data.data);
-            } catch (error) {
-                console.error("Error fetching folders:", error);
-            }
-        };
-        fetchFolders();
-    }, []);
-
     const form = useForm<FolderInput>({
         resolver: zodResolver(folderSchema),
         defaultValues: {
             id: data?.id,
             folder_name: data?.folder_name || '',
-            // local_path: data?.local_path || '',
-            // start_date: data?.start_date ? new Date(data.start_date) : null,
-            // end_date: data?.end_date ? new Date(data.end_date) : null,
-            // department_id: data?.departments?.map(dept => dept.id).filter(id => id !== undefined) ?? [],
-            department_id: data?.department_id ?? user?.position?.department_id,
-            parent_id: data?.parent_id !== undefined && data?.parent_id !== null ? Number(data.parent_id) : null,
         },
     });
-
-    // useEffect(() => {
-    //     if (user && user?.position?.department_id) {
-    //         form.setValue("department_id", [Number(user?.position?.department_id)]);
-    //     }
-    // }, [user, form]);
 
     useEffect(() => {
         if (isOpen) {
@@ -134,13 +90,6 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
             setRemovedFileIds([]);
             form.reset({
                 folder_name: data?.folder_name || '',
-                // local_path: data?.local_path || '',
-                // start_date: data?.start_date ? new Date(data.start_date) : null,
-                // end_date: data?.end_date ? new Date(data.end_date) : null,
-                // department_id: data?.departments?.map(dept => dept.id).filter(id => id !== undefined) ?? [],
-                department_id: data?.department_id ?? user?.position?.department_id,
-                parent_id: data?.parent_id !== undefined && data?.parent_id !== null ? Number(data.parent_id) : null,
-
 
             });
         }
@@ -181,21 +130,6 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
         Object.entries(formData).forEach(([key, value]) => {
             formattedData.append(key, value as string);
         });
-
-        // if (formData.department_id && formData.department_id.length > 0) {
-        //     formData.department_id.forEach(id => formattedData.append("department_id[]", id.toString()));
-        // }
-
-        // if (formData.start_date) {
-        //     formattedData.append('start_date', format(new Date(formData.start_date), 'yyyy-MM-dd'));
-        // }
-        // if (formData.end_date) {
-        //     formattedData.append('end_date', format(new Date(formData.end_date), 'yyyy-MM-dd'));
-        // }
-
-        if (!formData.parent_id) {
-            formattedData.delete('parent_id');
-        }
 
         files.forEach((file, index) => {
             if (file.file) {
@@ -253,124 +187,6 @@ const AppFolderForm: FC<AppFolderFormProps> = ({ data, isOpen, onClose, queryCli
                                         <FormControl>
                                             <Input type='text' {...field} />
                                         </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
-                            {/* <FormField
-                                control={form.control}
-                                name='local_path'
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Local Path</FormLabel>
-                                        <FormControl>
-                                            <Input type='text' {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            /> */}
-
-                            {/* <Controller
-                                control={form.control}
-                                name='start_date'
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Start Date</FormLabel>
-                                        <FormControl>
-                                            <DatePicker
-                                                onChange={(date) => field.onChange(date || null)}
-                                                value={field.value}
-                                                format='y-MM-dd'
-                                                clearIcon={null}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
-                            <Controller
-                                control={form.control}
-                                name='end_date'
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>End Date</FormLabel>
-                                        <FormControl>
-                                            <DatePicker
-                                                onChange={(date) => field.onChange(date || null)}
-                                                value={field.value}
-                                                format='y-MM-dd'
-                                                clearIcon={null}
-                                            />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            /> */}
-
-                            {/* <FormField
-                                control={form.control}
-                                name="department_id"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Department</FormLabel>
-                                        <FormControl>
-                                            {user?.position?.department_id ? (
-                                                <Input
-                                                    type="text"
-                                                    value={
-                                                        departments.find(dept => dept.id === Number(user?.position?.department_id))?.name || ''
-                                                    }
-                                                    placeholder="No department assigned"
-                                                    readOnly
-                                                />
-                                            ) : (
-                                                <Select
-                                                    isMulti
-                                                    options={departments.map(dept => ({
-                                                        value: dept.id,
-                                                        label: dept.name
-                                                    }))}
-                                                    onChange={selected =>
-                                                        field.onChange(selected.map(option => option.value))
-                                                    }
-                                                    value={departments
-                                                        .filter(dept => field.value?.includes(dept.id!))
-                                                        .map(dept => ({
-                                                            value: dept.id,
-                                                            label: dept.name
-                                                        }))}
-                                                />
-                                            )}
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            /> */}
-
-
-                            <FormField
-                                control={form.control}
-                                name="parent_id"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Parent Folder</FormLabel>
-                                        <Select
-                                            defaultValue={folders.find(folder => folder.id === field.value) ? {
-                                                value: field.value,
-                                                label: folders.find(folder => folder.id === field.value)?.folder_name,
-                                            } : null}
-                                            options={folders
-                                                .filter(folder => folder.id !== data?.id)
-                                                .map(folder => ({
-                                                    value: folder.id,
-                                                    label: folder.folder_name,
-                                                }))}
-                                            onChange={option => field.onChange(option?.value)}
-                                            isClearable
-                                        />
                                         <FormMessage />
                                     </FormItem>
                                 )}
