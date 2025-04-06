@@ -89,7 +89,6 @@ export default function AppShowFoldersTable({ setSelectedFolders, selectedFolder
         searchKeyword,
         sorting.map((item) => item.id).join(','),
         Boolean(sorting.map((item) => item.desc).join(',')),
-        user?.position?.department_id,
         showAllFolders
     );
 
