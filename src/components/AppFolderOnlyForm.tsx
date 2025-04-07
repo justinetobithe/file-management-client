@@ -54,15 +54,15 @@ const AppFolderOnlyForm: FC<AppFolderOnlyFormProps> = ({ isOpen, onClose, queryC
         resolver: zodResolver(folderSchema),
         defaultValues: {
             folder_name: '',
-            department_id: user?.position?.department_id ?? undefined,
+            department_id: user?.position?.department?.id ?? undefined,
         },
     });
 
     useEffect(() => {
         if (isOpen) {
-            form.reset({ folder_name: '', department_id: user?.position?.department_id ?? undefined });
+            form.reset({ folder_name: '', department_id: user?.position?.department?.id ?? undefined });
         }
-    }, [isOpen, form, user?.position?.department_id]);
+    }, [isOpen, form, user?.position?.department?.id]);
 
     const { mutate: createFolder, isPending: isCreating } = useAddFolder();
 
