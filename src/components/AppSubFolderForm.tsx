@@ -82,7 +82,7 @@ const AppSubFolderForm: FC<AppSubFolderFormProps> = ({ folder, data, isOpen, onC
         defaultValues: {
             id: data?.id,
             folder_name: data?.folder_name || '',
-            department_id: data?.department_id ?? user?.position?.department_id,
+            department_id: data?.department_id ?? user?.position?.department?.id,
             parent_id: data?.parent_id ?? folder?.id,
         },
     });
@@ -94,7 +94,7 @@ const AppSubFolderForm: FC<AppSubFolderFormProps> = ({ folder, data, isOpen, onC
             setRemovedFileIds([]);
             form.reset({
                 folder_name: data?.folder_name || '',
-                department_id: data?.department_id ?? user?.position?.department_id,
+                department_id: data?.department_id ?? user?.position?.department?.id,
                 parent_id: data?.parent_id ?? folder?.id,
             });
         }
