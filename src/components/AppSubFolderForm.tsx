@@ -145,7 +145,7 @@ const AppSubFolderForm: FC<AppSubFolderFormProps> = ({ folder, data, isOpen, onC
                 formattedData.append(`uploaded_files[${index}]`, file.file);
             }
         });
- 
+
         setLoading(true);
 
         if (data && data.id) {
@@ -180,7 +180,7 @@ const AppSubFolderForm: FC<AppSubFolderFormProps> = ({ folder, data, isOpen, onC
         <AlertDialog open={isOpen}>
             <AlertDialogContent>
                 <AlertDialogHeader>
-                    <AlertDialogTitle>{data ? `Edit Subfolder for ${folder?.folder_name}` : 'Add Subfolder'}</AlertDialogTitle>
+                    <AlertDialogTitle>{data ? `Edit Subfolder for ${folder?.folder_name}` : `Add Subfolder for ${folder?.folder_name}`}</AlertDialogTitle>
                 </AlertDialogHeader>
                 <div style={{ maxHeight: '70vh', overflowY: 'auto' }}>
                     <Form {...form}>

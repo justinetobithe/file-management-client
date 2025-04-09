@@ -32,7 +32,7 @@ import debounce from 'lodash.debounce';
 import User from '@/types/User';
 import { api } from '@/lib/api';
 import AppSubFolderForm from './AppSubFolderForm';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu'; 
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 import Select from 'react-select';
 
 interface AppFoldersTableProps {
