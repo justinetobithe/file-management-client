@@ -190,7 +190,6 @@ export default function AppFoldersTable({ setSelectedFolders, selectedFolders }:
         setPagination({ pageIndex: 0, pageSize });
     };
 
-
     const columns: ColumnDef<Folder>[] = [
         ...(user?.position?.section_head === 1
             ? [

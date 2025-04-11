@@ -33,7 +33,7 @@ import User from '@/types/User';
 const folderSchema = z.object({
     id: z.number().optional(),
     folder_name: z.string().min(1, { message: 'Folder name is required' }),
-    department_id: z.number(),
+    department_id: z.number().optional(),
     parent_id: z.number().optional(),
     uploaded_files: z.array(
         z.object({
@@ -63,6 +63,8 @@ const AppSubFolderForm: FC<AppSubFolderFormProps> = ({ folder, data, isOpen, onC
     const [removedFileIds, setRemovedFileIds] = useState<number[]>([]);
 
     const [user, setUser] = useState<User | null>(null);
+
+    console.log('folder', folder);
 
     useEffect(() => {
         const fetchUser = async () => {
